@@ -1,4 +1,5 @@
-<!doctype html>
+```html
+<!Doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
@@ -1379,3 +1380,4 @@ renderLogs();
 </script>
 </body>
 </html>
+```
