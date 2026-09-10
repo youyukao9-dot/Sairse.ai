@@ -3,250 +3,265 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>airp · 实时聊天</title>
+<title>airp · 鱼鱼机</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#dededb;--screen:#f3f3f0;--surface:#f7f7f4;--glass:rgba(255,255,255,.76);--glass2:rgba(255,255,255,.50);
-  --line:rgba(46,46,48,.12);--ink:#2f2f32;--muted:#8b8b91;--mine:#ddddda;--other:#fbfbf8;
-  --primary:#2b2b2d;--danger:#9e4a4a;--accent:#6366f1;--wallpaper:none;
+  --bg-app:#ececee;--bg:#f7f7f7;--card:#ffffff;--line:rgba(0,0,0,0.08);--line-light:rgba(0,0,0,0.04);
+  --ink:#2b2b2b;--muted:#8e8e93;--dim:#b5b5ba;--primary:#1a1a1a;--danger:#cf6666;--accent:#e11d48;
+  --wallpaper:none;
 }
 .night{
-  --bg:#111214;--screen:#17181a;--surface:#1e1f23;--glass:rgba(32,33,37,.82);--glass2:rgba(38,39,44,.65);
-  --line:rgba(255,255,255,.09);--ink:#eaeaea;--muted:#929299;--mine:#2c2d32;--other:#212226;
-  --primary:#ededed;--danger:#cf6666;--accent:#818cf8;
+  --bg-app:#0f1012;--bg:#17181a;--card:#1e1f23;--line:rgba(255,255,255,0.08);--line-light:rgba(255,255,255,0.04);
+  --ink:#ececec;--muted:#929299;--dim:#66666e;--primary:#f0f0f0;--danger:#e07777;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--screen)}
-button,input,textarea,select{font:inherit}button{border:0;background:none;color:inherit;cursor:pointer}button:active{transform:scale(.96)}
+html,body{margin:0;padding:0;width:100%;height:100%;font-family:'Plus Jakarta Sans','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--ink);background:var(--bg-app);display:flex;align-items:center;justify-content:center;overflow:hidden;user-select:none}
+button,input,textarea,select{font:inherit}button{border:0;background:none;color:inherit;cursor:pointer}button:active{transform:scale(.97)}
 
-/* 全屏手机视图，无外壳、无多余外层边框 */
-.screen{width:100vw;height:100vh;height:100dvh;position:relative;display:flex;flex-direction:column;overflow:hidden;background-color:var(--screen);background-image:var(--wallpaper),radial-gradient(circle at 80% 8%,rgba(255,255,255,.7),transparent 32%),linear-gradient(145deg,var(--screen),var(--bg));background-size:cover;background-position:center}
-.night .screen{background-image:var(--wallpaper),radial-gradient(circle at 80% 8%,rgba(255,255,255,.04),transparent 32%),linear-gradient(145deg,#191a1d,#121215)}
-.screen:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;background-image:radial-gradient(rgba(50,50,50,.12) .6px,transparent .8px);background-size:6px 6px;mix-blend-mode:multiply;z-index:1}
+/* 手机画幅外框 */
+.phoneContainer{width:100%;height:100dvh;background-color:var(--bg);background-image:var(--wallpaper);background-size:cover;background-position:center;position:relative;display:flex;flex-direction:column;overflow:hidden}
+@media(min-width:480px){
+  .phoneContainer{max-width:420px;height:860px;max-height:94vh;border-radius:36px;border:1px solid rgba(0,0,0,0.12);box-shadow:0 24px 70px rgba(0,0,0,0.15)}
+}
+.night .phoneContainer{border-color:rgba(255,255,255,0.1)}
 
-/* 顶部状态栏 */
-.status{height:calc(36px + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);padding-left:18px;padding-right:18px;display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.04em;position:relative;z-index:10;user-select:none}
-.statusRight{display:flex;gap:8px;align-items:center;font-size:10px}
-.connDot{width:6px;height:6px;border-radius:50%;background:#10b981;display:inline-block}.connDot.offline{background:#f59e0b}
-.battery{width:21px;height:10px;border:1px solid currentColor;border-radius:3px;padding:1px;position:relative;display:flex;align-items:center}
-.battery i{display:block;height:100%;width:80%;background:currentColor;border-radius:1px}
-.battery:after{content:"";display:block;width:2px;height:4px;background:currentColor;position:absolute;right:-4px;top:2px;border-radius:0 1px 1px 0}
+/* 拟真状态栏 */
+.statusBar{height:calc(36px + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);padding-left:18px;padding-right:18px;display:flex;justify-content:space-between;align-items:center;font-size:11px;font-family:monospace;letter-spacing:.05em;color:var(--muted);background:rgba(255,255,255,.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line-light);z-index:20;flex-shrink:0}
+.night .statusBar{background:rgba(26,27,30,.75)}
+.badgeApi{font-size:9px;padding:1px 6px;border-radius:99px;border:1px solid var(--line);font-family:monospace;background:rgba(255,255,255,.5)}
+.badgeApi.online{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.night .badgeApi.online{background:#064e3b;color:#a7f3d0;border-color:#047857}
 
-/* 页面容器与切换 */
-.viewContainer{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;z-index:2}
-.view{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden}.view.active{display:flex}
+/* 视图容器 */
+.mainViewport{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;overflow:hidden}
+.view{position:absolute;inset:0;display:none;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.view::-webkit-scrollbar{display:none}
+.view.active{display:flex}
 
-/* 主页 */
-.homeContent{flex:1;overflow-y:auto;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
-.homeContent::-webkit-scrollbar{display:none}
-.dateCard{padding:16px 18px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,.04)}
-.dateLine{display:flex;justify-content:space-between;align-items:flex-end}
-.day{font-size:38px;font-weight:300;line-height:1}.month{font-size:11px;color:var(--muted);letter-spacing:.18em;margin-top:4px}
-.homeQuote{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.5}
-.homeApps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.appIcon{aspect-ratio:1;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;box-shadow:0 6px 20px rgba(0,0,0,.03)}
-.appIcon:before{content:"";position:absolute;inset:7px;border:1px solid var(--line);border-radius:14px;pointer-events:none}
-.iconMark{font-size:20px;font-weight:300;line-height:1}.iconLabel{font-size:9px;color:var(--muted);margin-top:5px}
+/* 核心圆角卡片 */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;transition:border .2s;box-shadow:0 2px 10px rgba(0,0,0,.01)}
+.card:hover{border-color:rgba(0,0,0,0.16)}
+.night .card:hover{border-color:rgba(255,255,255,0.18)}
 
-/* 黑胶留声机 */
-.turntable{height:106px;border:1px solid var(--line);border-radius:26px;background:var(--glass2);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:flex;align-items:center;gap:16px;padding:14px 16px;box-shadow:0 8px 24px rgba(0,0,0,.04)}
-.disc{width:74px;height:74px;flex:0 0 auto;border-radius:50%;background:radial-gradient(circle,#e9e9e7 0 8px,#777 9px 10px,#29292b 11px 31px,#b7b7b5 32px 33px,#353537 34px 37px,#d6d6d2 38px);box-shadow:0 6px 14px rgba(0,0,0,.16);animation:spin 5s linear infinite;animation-play-state:paused}
-.disc.play{animation-play-state:running}@keyframes spin{to{transform:rotate(360deg)}}
-.turnInfo{min-width:0;flex:1}.turnInfo b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.turnInfo small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
-.wave{display:flex;gap:3px;height:18px;align-items:center;margin-top:8px}
-.wave i{width:2px;height:5px;background:#888;border-radius:2px;transition:height .2s ease}.wave.play i{animation:soundWave .7s ease-in-out infinite alternate}
-.wave i:nth-child(2){animation-delay:.1s}.wave i:nth-child(3){animation-delay:.2s}.wave i:nth-child(4){animation-delay:.3s}.wave i:nth-child(5){animation-delay:.4s}
-@keyframes soundWave{to{height:16px}}
+/* 日历组件 */
+.calHeader{display:flex;justify-content:space-between;align-items:flex-start}
+.calDateTitle{font-size:9px;font-family:monospace;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.calDayRow{font-size:32px;font-weight:300;line-height:1;margin-top:2px;display:flex;align-items:baseline;gap:8px}
+.calSubDay{font-size:10px;font-family:monospace;color:var(--muted);font-weight:normal}
+.checkinBtn{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;font-size:10px;font-family:monospace;border:1px solid var(--primary);background:var(--primary);color:var(--bg)}
+.checkinBtn.done{background:transparent;border-color:var(--line);color:var(--muted);cursor:default}
 
-/* 主页聊天卡片 */
-.homeChatCard{margin-top:auto;padding:14px 16px;border:1px solid var(--line);border-radius:24px;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.04)}
-.avatar{width:38px;height:38px;border-radius:14px;object-fit:cover;background:#d6d6d2;border:1px solid var(--line);flex-shrink:0}
-.homeChatTxt{flex:1;min-width:0;text-align:left}.homeChatTxt b{font-size:13px;display:block}.homeChatTxt small{display:block;color:var(--muted);font-size:10px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.arrowRight{font-size:18px;color:var(--muted)}
+.weekStrip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line-light);text-align:center}
+.weekDayItem{font-size:10px;font-family:monospace;color:var(--muted);padding:3px 0;border-radius:6px}
+.weekDayItem.today{background:var(--primary);color:var(--bg);font-weight:600}
 
-/* 聊天页面 */
-.chatHead{height:56px;padding:6px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:5;flex-shrink:0}
-.headBack{width:32px;height:32px;display:grid;place-items:center;font-size:24px;color:var(--ink);cursor:pointer;border-radius:10px}
-.headInfo{flex:1;min-width:0;text-align:left;cursor:pointer}.headInfo b{font-size:13px;display:block}.headInfo small{display:block;color:var(--muted);font-size:9px;margin-top:2px}
-.relTag{font-size:9px;padding:3px 8px;border:1px solid var(--line);border-radius:99px;color:var(--muted);white-space:nowrap;background:rgba(255,255,255,.4)}
-.dots{font-size:20px;letter-spacing:2px;cursor:pointer;padding:4px 8px;color:var(--ink)}
+.moodChips{display:flex;gap:4px;overflow-x:auto;padding:2px 0;margin-top:8px;border-top:1px solid var(--line-light);scrollbar-width:none}
+.moodChip{font-size:9px;font-family:monospace;padding:2px 8px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--muted);white-space:nowrap}
+.moodChip.active{background:var(--primary);color:var(--bg);border-color:var(--primary)}
 
-.messages{flex:1;min-height:0;overflow-y:auto;padding:14px 14px 10px;scrollbar-width:none;display:flex;flex-direction:column}
-.messages::-webkit-scrollbar{display:none}
-.msg{display:flex;gap:8px;margin:8px 0;animation:pop .2s ease both}
-.msg.mine{justify-content:flex-end}.msg.mine .bubbleWrap{align-items:flex-end}.msg.mine .avatar{order:2}
-.bubbleWrap{max-width:82%;display:flex;flex-direction:column;align-items:flex-start}
-.bubble{border:1px solid var(--line);padding:10px 13px;border-radius:18px;background:var(--other);font-size:13px;line-height:1.6;box-shadow:0 3px 12px rgba(0,0,0,.03);word-break:break-word;white-space:pre-wrap;position:relative}
-.mine .bubble{background:var(--mine);border-top-right-radius:4px}
-.other .bubble{border-top-left-radius:4px}
-.time{font-size:9px;color:var(--muted);margin:3px 5px}
-.quoteBox{border-left:2px solid #888;padding:5px 8px;margin-bottom:7px;color:var(--muted);background:rgba(0,0,0,.04);border-radius:6px;font-size:11px}
-.systemMsg{text-align:center;font-size:10px;color:var(--muted);margin:12px auto;padding:4px 12px;border-radius:99px;background:rgba(0,0,0,.04);max-width:85%}
+/* 对话与唱片入口 */
+.avatarRound{width:40px;height:40px;border-radius:50%;object-fit:cover;background:#e5e5ea;border:1px solid var(--line);flex-shrink:0}
+.avatarSmall{width:32px;height:32px;border-radius:50%;object-fit:cover;background:#e5e5ea;border:1px solid var(--line);flex-shrink:0}
 
-/* 打字机光标 */
-.typingCursor{display:inline-block;width:2px;height:1.15em;background:currentColor;vertical-align:-.15em;margin-left:3px;animation:cursorBlink .7s infinite}
-@keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
+.discVinyl{width:38px;height:38px;border-radius:50%;background:#1a1a1a;border:3px solid #444;display:grid;place-items:center;flex-shrink:0;position:relative}
+.discVinyl.spin{animation:spinDisc 7s linear infinite}
+@keyframes spinDisc{to{transform:rotate(360deg)}}
+.discVinyl:after{content:"";width:10px;height:10px;background:#dedede;border-radius:50%;border:2px solid #1a1a1a}
 
-/* 快捷标点栏 */
-.quick{display:flex;gap:6px;overflow-x:auto;padding:6px 12px;scrollbar-width:none;background:rgba(247,247,244,.4);border-top:1px solid var(--line);flex-shrink:0}
-.night .quick{background:rgba(20,21,24,.4)}
-.quick button{white-space:nowrap;border:1px solid var(--line);background:var(--glass);border-radius:99px;padding:4px 10px;font-size:11px;color:var(--ink);cursor:pointer}
+/* 胶片画报卡片 */
+.polaroidGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.polaroidItem{aspect-ratio:4/5;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#f0f0f0;position:relative;cursor:pointer}
+.polaroidItem img{width:100%;height:100%;object-fit:cover;filter:grayscale(25%)}
+.polaroidTag{position:absolute;top:4px;left:4px;font-size:8px;font-family:monospace;color:#fff;background:rgba(0,0,0,.5);padding:1px 4px;border-radius:4px}
 
-/* 引用提示条 */
-.quotingBanner{display:flex;justify-content:space-between;align-items:center;padding:6px 14px;background:var(--mine);border-top:1px solid var(--line);font-size:10px;color:var(--ink)}
+/* 对话界面 */
+.chatHead{height:54px;padding:0 14px;background:rgba(255,255,255,.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
+.night .chatHead{background:rgba(30,31,35,.8)}
+.messagesBox{flex:1;min-height:0;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;scrollbar-width:none}
 
-/* 输入区域 */
-.composer{padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;align-items:flex-end;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);flex-shrink:0}
-.toolBtn{width:34px;height:34px;border:1px solid var(--line);border-radius:12px;background:var(--glass);display:grid;place-items:center;font-size:15px;color:var(--ink);cursor:pointer;flex-shrink:0}
-.inputField{flex:1;min-width:0;border:1px solid var(--line);background:var(--glass);border-radius:16px;min-height:34px;max-height:96px;padding:8px 12px;font-size:13px;line-height:1.45;resize:none;outline:none;color:var(--ink);font-family:inherit}
-.sendBtn{height:34px;padding:0 14px;border-radius:12px;background:var(--primary);color:var(--screen);font-size:12px;font-weight:500;cursor:pointer;display:grid;place-items:center;flex-shrink:0}
-.stopBtn{height:34px;padding:0 12px;border-radius:12px;background:var(--danger);color:#fff;font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;flex-shrink:0}
+.msgRow{display:flex;gap:10px;align-items:flex-end}
+.msgRow.mine{flex-direction:row-reverse}
+.msgBubble{max-width:78%;padding:10px 13px;border-radius:14px;font-size:12px;line-height:1.6;border:1px solid var(--line);word-break:break-word;white-space:pre-wrap}
+.msgRow.other .msgBubble{background:var(--card);border-bottom-left-radius:3px}
+.msgRow.mine .msgBubble{background:var(--primary);color:var(--bg);border-color:var(--primary);border-bottom-right-radius:3px}
+.msgTime{font-size:9px;font-family:monospace;color:var(--dim);margin-top:3px}
 
-/* 空状态引导 */
-.chatEmptyState{margin:auto;text-align:center;padding:32px 20px;max-width:280px}
-.emptyLogo{width:52px;height:52px;border-radius:20px;border:1px solid var(--line);background:var(--glass);display:grid;place-items:center;font-size:22px;font-weight:300;margin:0 auto 14px}
-.emptyTitle{font-size:13px;font-weight:500;margin-bottom:6px}
-.emptyDesc{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:16px}
-.emptyBtn{display:inline-block;padding:8px 16px;border-radius:12px;background:var(--primary);color:var(--screen);font-size:11px;font-weight:500;cursor:pointer}
+.quotePreview{padding:4px 8px;margin-bottom:6px;border-left:2px solid var(--muted);background:rgba(0,0,0,.04);border-radius:4px;font-size:10px;color:var(--muted)}
+.quotingBanner{display:flex;justify-content:space-between;align-items:center;padding:5px 12px;background:var(--card);border-top:1px solid var(--line);font-size:10px;font-family:monospace;color:var(--muted)}
 
-/* 子页面 (朋友圈/好友/记录) */
-.subHead{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:5;flex-shrink:0}
-.subHead b{font-size:14px}
-.subHead button{width:32px;height:32px;display:grid;place-items:center;font-size:20px;color:var(--ink);cursor:pointer}
-.subBody{flex:1;min-height:0;overflow-y:auto;padding:14px 16px;scrollbar-width:none}
-.subBody::-webkit-scrollbar{display:none}
-.bottomNav{height:calc(50px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);display:flex;border-top:1px solid var(--line);background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);flex-shrink:0}
-.navBtn{flex:1;font-size:10px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
-.navBtn.active{color:var(--ink);font-weight:600}
+.typingCursor{display:inline-block;width:2px;height:1.1em;background:currentColor;vertical-align:-.12em;margin-left:2px;animation:blink .7s infinite}
+@keyframes blink{50%{opacity:0}}
 
-.momentCard{padding:14px;border:1px solid var(--line);background:var(--glass);border-radius:20px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.03)}
-.momentHead{display:flex;gap:10px;align-items:center;margin-bottom:8px}.momentHead b{font-size:12px;display:block}.momentHead small{display:block;color:var(--muted);font-size:9px;margin-top:2px}
-.momentBody{font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
-.momentActions{display:flex;gap:14px;margin-top:10px;font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
+.quickBar{display:flex;gap:5px;overflow-x:auto;padding:5px 12px;background:rgba(255,255,255,.7);border-top:1px solid var(--line-light);scrollbar-width:none}
+.night .quickBar{background:rgba(30,31,35,.7)}
+.quickBar button{padding:2px 8px;border:1px solid var(--line);border-radius:99px;font-size:10px;background:var(--card);white-space:nowrap;font-family:monospace}
 
-.friendRow{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);background:var(--glass);border-radius:18px;margin-bottom:10px}
-.friendRow .grow{flex:1;min-width:0}.friendRow b{font-size:13px;display:block}.friendRow small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
-.miniBtn{padding:6px 12px;border:1px solid var(--line);border-radius:12px;font-size:10px;background:var(--glass);color:var(--ink);cursor:pointer;white-space:nowrap}
-.miniBtn.primary{background:var(--primary);color:var(--screen)}
+.composerBox{padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--line);display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
+.composerInput{flex:1;border:1px solid var(--line);background:rgba(0,0,0,.03);border-radius:12px;padding:8px 12px;font-size:12px;outline:none;resize:none;max-height:80px;min-height:36px;line-height:1.4;color:var(--ink)}
+.sendBtn{width:36px;height:36px;border-radius:12px;background:var(--primary);color:var(--bg);display:grid;place-items:center;flex-shrink:0}
+.stopBtn{height:36px;padding:0 10px;border-radius:12px;background:var(--danger);color:#fff;font-size:10px;font-family:monospace;display:flex;align-items:center;gap:4px}
 
-.logItem{padding:11px 13px;border-left:3px solid #888;background:var(--glass);border-radius:0 14px 14px 0;margin-bottom:9px;font-size:11px;line-height:1.5}
-.logHeader{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;margin-bottom:4px}
+/* 底部微导航 */
+.bottomTabBar{height:calc(50px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(255,255,255,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:space-around;align-items:center;flex-shrink:0;z-index:10}
+.night .bottomTabBar{background:rgba(24,25,28,.85)}
+.tabBtn{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:9px;font-family:monospace;letter-spacing:.08em}
+.tabBtn.active{color:var(--primary);font-weight:600}
 
-/* 弹窗抽屉 */
-.overlay{position:absolute;inset:0;background:rgba(15,15,18,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:50;display:none;align-items:flex-end;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px));animation:fadeIn .2s ease}
-.overlay.show{display:flex}
-.modalSheet{width:100%;max-height:88%;overflow-y:auto;background:var(--surface);border:1px solid var(--line);border-radius:28px;box-shadow:0 24px 60px rgba(0,0,0,.25);padding:20px;animation:up .22s cubic-bezier(.16,1,.3,1)}
-.modalHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.modalHead h3{margin:0;font-size:15px;font-weight:600}
-.closeBtn{font-size:22px;color:var(--muted);cursor:pointer;padding:2px 6px}
-.field{margin:12px 0}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:500}
-.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:var(--glass);border-radius:14px;padding:10px 12px;font-size:12px;outline:none;color:var(--ink);font-family:inherit}
-.field textarea{min-height:76px;resize:vertical}
-.fieldHint{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4}
-.modalBtns{display:flex;gap:10px;margin-top:18px}
-.modalBtns button{flex:1;padding:11px;border-radius:14px;border:1px solid var(--line);font-size:12px;font-weight:500;background:var(--glass);color:var(--ink);cursor:pointer}
-.modalBtns .primary{background:var(--primary);color:var(--screen)}
-.divider{height:1px;background:var(--line);margin:16px 0}
-.menuGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.menuGrid button{padding:14px 8px;border:1px solid var(--line);border-radius:16px;background:var(--glass);font-size:11px;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
+/* 抽屉与弹窗 */
+.drawerOverlay{position:absolute;inset:0;background:rgba(0,0,0,.25);backdrop-filter:blur(2px);z-index:50;display:none;justify-content:flex-end}
+.drawerOverlay.show{display:flex}
+.drawerSheet{width:280px;max-width:85%;height:100%;background:var(--bg);border-left:1px solid var(--line);display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(0,0,0,.1)}
+.drawerItem{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--card);margin-bottom:8px;font-size:12px;cursor:pointer}
+
+.modalOverlay{position:absolute;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(3px);z-index:60;display:none;align-items:center;justify-content:center;padding:16px}
+.modalOverlay.show{display:flex}
+.modalCard{width:100%;max-width:360px;max-height:86vh;background:var(--card);border-radius:18px;border:1px solid var(--line);box-shadow:0 20px 50px rgba(0,0,0,.2);display:flex;flex-direction:column;overflow:hidden}
+.modalHead{padding:12px 16px;border-bottom:1px solid var(--line-light);display:flex;justify-content:space-between;align-items:center}
+.modalBody{padding:14px 16px;overflow-y:auto;flex:1;font-size:12px;display:flex;flex-direction:column;gap:12px;scrollbar-width:none}
+.fieldBox label{display:block;font-size:9px;font-family:monospace;color:var(--muted);margin-bottom:4px;text-transform:uppercase}
+.fieldBox input,.fieldBox textarea,.fieldBox select{width:100%;border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:12px;background:rgba(0,0,0,.03);outline:none;color:var(--ink)}
+.modalBtns{padding:10px 16px;border-top:1px solid var(--line-light);display:flex;justify-content:flex-end;gap:8px}
+.pillBtn{padding:6px 14px;border-radius:99px;border:1px solid var(--line);font-size:10px;font-family:monospace;background:var(--card);cursor:pointer;color:var(--ink)}
+.pillBtn.dark{background:var(--primary);color:var(--bg);border-color:var(--primary)}
 
 /* 轻提示 */
-.toast{position:absolute;left:50%;bottom:calc(75px + env(safe-area-inset-bottom,0px));transform:translate(-50%,15px);z-index:90;background:rgba(30,30,32,.94);color:#fff;padding:8px 16px;border-radius:99px;font-size:11px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;white-space:nowrap;max-width:88%;overflow:hidden;text-overflow:ellipsis}
+.toast{position:absolute;left:50%;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);z-index:90;background:rgba(20,20,20,.88);color:#fff;padding:6px 14px;border-radius:99px;font-size:10px;font-family:monospace;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap}
 .toast.show{opacity:1;transform:translate(-50%,0)}
-
-@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
-@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
-<div class="screen" id="screen">
+
+<div class="phoneContainer" id="phoneBox">
   <!-- 顶部状态栏 -->
-  <header class="status">
-    <span id="statusClock">12:00</span>
-    <div class="statusRight">
-      <span class="connDot" id="connIndicator"></span>
+  <header class="statusBar">
+    <div style="display:flex;align-items:center;gap:4px">
+      <span id="sysClock">12:00</span>
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <span class="badgeApi" id="statusApiBadge">LOCAL</span>
       <span>5G</span>
-      <span id="batteryText">85%</span>
-      <span class="battery"><i id="batteryBar"></i></span>
+      <span id="batteryPct">88%</span>
     </div>
   </header>
 
-  <div class="viewContainer">
-    <!-- 主页 -->
-    <section class="view active" id="homeView">
-      <div class="homeContent">
-        <div class="dateCard">
-          <div class="dateLine">
-            <div>
-              <div class="day" id="homeDay">09</div>
-              <div class="month" id="homeMonth">SEP / WEDNESDAY</div>
-            </div>
-            <div class="iconMark">+</div>
+  <!-- 主视口视图 -->
+  <main class="mainViewport">
+    <!-- 1. 主页 HOME -->
+    <section class="view active" id="viewHome" style="padding:14px;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:9px;font-family:monospace;color:var(--muted);letter-spacing:.1em;display:flex;align-items:center;gap:4px">
+            <span>AIRP · INS SWEET-COOL</span>
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           </div>
-          <div class="homeQuote">今天也把一点点温柔留给自己。</div>
+          <h1 style="margin:2px 0 0;font-size:16px;font-weight:500;letter-spacing:-.02em">极简时光站</h1>
         </div>
-
-        <div class="homeApps">
-          <button class="appIcon" data-go="chat" type="button">
-            <div class="iconMark">+</div>
-            <div class="iconLabel">chat</div>
-          </button>
-          <button class="appIcon" data-go="moments" type="button">
-            <div class="iconMark">×</div>
-            <div class="iconLabel">moments</div>
-          </button>
-          <button class="appIcon" data-go="friends" type="button">
-            <div class="iconMark">□</div>
-            <div class="iconLabel">friends</div>
-          </button>
-          <button class="appIcon" id="homeSettingsBtn" type="button">
-            <div class="iconMark">○</div>
-            <div class="iconLabel">settings</div>
-          </button>
-        </div>
-
-        <div class="turntable">
-          <div class="disc" id="homeDisc"></div>
-          <div class="turnInfo" id="homeMusicInfo">
-            <b id="homeSong">little grey song</b>
-            <small id="homeArtist">airp local player</small>
-            <div class="wave" id="homeWave"><i></i><i></i><i></i><i></i><i></i></div>
-          </div>
-          <button class="toolBtn" id="homePlayBtn" type="button">▶</button>
-        </div>
-
-        <button class="homeChatCard" data-go="chat" type="button">
-          <img class="avatar" id="homeAvatar" alt="avatar">
-          <div class="homeChatTxt">
-            <b id="homeChatName">小熊</b>
-            <small id="homeChatPreview">轻触开启与 airp 的实时对话。</small>
-          </div>
-          <span class="arrowRight">›</span>
+        <button id="openDrawerBtn" type="button" style="width:32px;height:32px;border:1px solid var(--line);border-radius:50%;background:var(--card);display:grid;place-items:center">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
         </button>
+      </div>
+
+      <!-- 日历组件 -->
+      <div class="card">
+        <div class="calHeader">
+          <div>
+            <div class="calDateTitle" id="calMonthWeek">SEP · WEDNESDAY</div>
+            <div class="calDayRow">
+              <span id="calDay">10</span>
+              <span class="calSubDay" id="calRelDays">/ DAY 7</span>
+            </div>
+          </div>
+          <button class="checkinBtn" id="checkinBtn" type="button">♡ CHECK IN</button>
+        </div>
+        <div class="weekStrip" id="weekStrip"></div>
+        <div class="moodChips" id="moodChips">
+          <button class="moodChip active">#静谧</button>
+          <button class="moodChip">#甜丧</button>
+          <button class="moodChip">#微凉</button>
+          <button class="moodChip">#放空</button>
+          <button class="moodChip">#安宁</button>
+        </div>
+        <p id="homeStatusQuote" style="margin:8px 0 0;font-size:11px;color:var(--muted);line-height:1.5">把今天妥帖地折叠起来，留一点空白给明日。</p>
+      </div>
+
+      <!-- 对话卡片 -->
+      <div class="card" id="goChatCard" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+        <img class="avatarRound" id="homeAiAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:12px;font-weight:500" id="homeAiName">小熊</span>
+            <span style="font-size:8px;font-family:monospace;padding:1px 5px;border-radius:99px;border:1px solid var(--line);color:var(--muted)" id="homeAiRel">恋人</span>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="homeLastMsg">轻触开启与 airp 的实时流式对话 ♡</div>
+        </div>
+        <span style="color:var(--dim);font-size:16px">›</span>
+      </div>
+
+      <!-- 留声机卡片 -->
+      <div class="card" id="turntableCard" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="discVinyl" id="homeDisc"></div>
+          <div>
+            <div style="font-size:12px;font-weight:500" id="homeTrackTitle">little grey song</div>
+            <div style="font-size:9px;font-family:monospace;color:var(--muted)" id="homeTrackArtist">airp · lofi study</div>
+          </div>
+        </div>
+        <button id="togglePlayBtn" type="button" style="width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center">▶</button>
+      </div>
+
+      <!-- 胶片画报卡片 -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:monospace">
+          <span>POLAROID INS · 胶片画报</span>
+          <span>PREVIEW (3)</span>
+        </div>
+        <div class="polaroidGrid">
+          <div class="polaroidItem" onclick="openLightbox('https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80', 'NIGHT COLD / 夜巡')">
+            <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=300&auto=format&fit=crop&q=80">
+            <span class="polaroidTag">NIGHT</span>
+          </div>
+          <div class="polaroidItem" onclick="openLightbox('https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=600&auto=format&fit=crop&q=80', 'GREY MIST / 晨雾')">
+            <img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=300&auto=format&fit=crop&q=80">
+            <span class="polaroidTag">MIST</span>
+          </div>
+          <div class="polaroidItem" onclick="openLightbox('https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=600&auto=format&fit=crop&q=80', 'SOFT SHADOW / 微光')">
+            <img src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=300&auto=format&fit=crop&q=80">
+            <span class="polaroidTag">COOL</span>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- 实时聊天界面 -->
-    <section class="view" id="chatView">
+    <!-- 2. 实时对话 CHAT -->
+    <section class="view" id="viewChat">
       <header class="chatHead">
-        <button class="headBack" id="chatBackBtn" type="button">‹</button>
-        <img class="avatar" id="peerAvatar" alt="avatar" style="width:34px;height:34px;cursor:pointer">
-        <div class="headInfo" id="chatTitleInfo">
-          <b id="peerName">小熊</b>
-          <small id="peerSub">在线 · 实时对话就绪</small>
+        <div style="display:flex;align-items:center;gap:8px;cursor:pointer" id="chatTitleInfo">
+          <img class="avatarSmall" id="chatAiAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80">
+          <div>
+            <div style="font-size:12px;font-weight:500" id="chatAiName">小熊</div>
+            <div style="font-size:8px;font-family:monospace;color:var(--muted)" id="chatModelStatus">STREAM · LOCAL</div>
+          </div>
         </div>
-        <span class="relTag" id="relTag" style="display:none">恋人</span>
-        <button class="dots" id="chatMenuBtn" type="button">···</button>
+        <div style="display:flex;gap:6px">
+          <button id="clearChatBtn" type="button" style="padding:4px 8px;border:1px solid var(--line);border-radius:99px;font-size:9px;font-family:monospace;color:var(--muted)">CLEAR</button>
+          <button id="chatMenuBtn" type="button" style="padding:4px 8px;border:1px solid var(--line);border-radius:99px;font-size:9px;font-family:monospace;color:var(--primary)">MENU</button>
+        </div>
       </header>
 
-      <div class="messages" id="messages"></div>
+      <div class="messagesBox" id="messagesBox"></div>
 
+      <!-- 双击引用提示条 -->
       <div class="quotingBanner" id="quotingBanner" style="display:none">
         <span id="quotingText">引用消息</span>
-        <button type="button" id="cancelQuoteBtn">×</button>
+        <button type="button" id="cancelQuoteBtn" style="font-size:14px">×</button>
       </div>
 
-      <div class="quick" id="quickBar">
+      <!-- 快捷标点 -->
+      <div class="quickBar">
         <button data-ins="，">，</button>
         <button data-ins="。">。</button>
         <button data-ins="？">？</button>
@@ -257,1124 +272,1148 @@ button,input,textarea,select{font:inherit}button{border:0;background:none;color:
         <button data-ins="【 】">【 】</button>
       </div>
 
-      <div class="composer">
-        <button class="toolBtn" id="chatToolBtn" type="button">＋</button>
-        <textarea class="inputField" id="chatInput" rows="1" placeholder="写点什么..."></textarea>
-        <button class="sendBtn" id="sendBtn" type="button">发送</button>
+      <div class="composerBox">
+        <textarea class="composerInput" id="chatInput" rows="1" placeholder="写点什么，按回车发送..."></textarea>
+        <button class="sendBtn" id="sendBtn" type="button">↑</button>
         <button class="stopBtn" id="stopBtn" type="button" style="display:none">■ 停止</button>
       </div>
     </section>
 
-    <!-- 朋友圈 -->
-    <section class="view" id="momentsView">
-      <header class="subHead">
-        <button data-go="home" type="button">‹</button>
-        <b>朋友圈</b>
-        <button id="addMomentBtn" type="button">＋</button>
-      </header>
-      <div class="subBody" id="momentsList"></div>
-      <nav class="bottomNav">
-        <button class="navBtn" data-go="chat" type="button"><span>＋</span><span>聊天</span></button>
-        <button class="navBtn active" type="button"><span>×</span><span>朋友圈</span></button>
-        <button class="navBtn" data-go="friends" type="button"><span>□</span><span>好友</span></button>
-      </nav>
+    <!-- 3. 时间书 TIME BOOK -->
+    <section class="view" id="viewBook" style="padding:14px;gap:12px">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:9px;font-family:monospace;color:var(--muted)">TIME BOOK · CHRONICLE</div>
+          <div style="font-size:15px;font-weight:500;margin-top:2px">时间书 · 装订页</div>
+        </div>
+        <button class="pillBtn dark" id="newBookPageBtn" type="button">+ 写一页</button>
+      </div>
+      <div id="timeBookList" style="display:flex;flex-direction:column;gap:10px"></div>
     </section>
 
-    <!-- 好友列表 -->
-    <section class="view" id="friendsView">
-      <header class="subHead">
-        <button data-go="home" type="button">‹</button>
-        <b>好友</b>
-        <button id="addFriendBtn" type="button">＋</button>
-      </header>
-      <div class="subBody" id="friendsList"></div>
-      <nav class="bottomNav">
-        <button class="navBtn" data-go="chat" type="button"><span>＋</span><span>聊天</span></button>
-        <button class="navBtn" data-go="moments" type="button"><span>×</span><span>朋友圈</span></button>
-        <button class="navBtn active" type="button"><span>□</span><span>好友</span></button>
-      </nav>
+    <!-- 4. 动态圈 MOMENTS -->
+    <section class="view" id="viewMoments" style="padding:14px;gap:12px">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:9px;font-family:monospace;color:var(--muted)">MOMENTS · FEED</div>
+          <div style="font-size:15px;font-weight:500;margin-top:2px">动态圈</div>
+        </div>
+        <button class="pillBtn dark" id="newMomentBtn" type="button">+ 发布</button>
+      </div>
+      <div id="momentsList" style="display:flex;flex-direction:column;gap:10px"></div>
     </section>
 
-    <!-- 查岗 / 后台记录 -->
-    <section class="view" id="logsView">
-      <header class="subHead">
-        <button data-go="chat" type="button">‹</button>
-        <b>查岗 / 后台记录</b>
-        <button id="clearLogsBtn" type="button" style="font-size:12px">清空</button>
-      </header>
-      <div class="subBody" id="logsList"></div>
+    <!-- 5. 好友列表 FRIENDS -->
+    <section class="view" id="viewFriends" style="padding:14px;gap:12px">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:9px;font-family:monospace;color:var(--muted)">FRIENDS · CONTACTS</div>
+          <div style="font-size:15px;font-weight:500;margin-top:2px">好友列表</div>
+        </div>
+        <button class="pillBtn dark" id="newFriendBtn" type="button">+ 加好友</button>
+      </div>
+      <div id="friendsList" style="display:flex;flex-direction:column;gap:8px"></div>
     </section>
+
+    <!-- 6. 查岗记录 AUDIT LOGS -->
+    <section class="view" id="viewLogs" style="padding:14px;gap:12px">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:9px;font-family:monospace;color:var(--muted)">AUDIT LOGS · 查岗</div>
+          <div style="font-size:15px;font-weight:500;margin-top:2px">后台系统事件记录</div>
+        </div>
+        <button class="pillBtn" id="clearLogsBtn" type="button">清空日志</button>
+      </div>
+      <div id="logsList" style="display:flex;flex-direction:column;gap:6px"></div>
+    </section>
+  </main>
+
+  <!-- 底部微信改版极简导航条 -->
+  <nav class="bottomTabBar">
+    <button class="tabBtn active" data-tab="Home" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+      <span>HOME</span>
+    </button>
+    <button class="tabBtn" data-tab="Chat" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+      <span>CHAT</span>
+    </button>
+    <button class="tabBtn" data-tab="Book" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+      <span>BOOK</span>
+    </button>
+    <button class="tabBtn" data-tab="Moments" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+      <span>FEED</span>
+    </button>
+  </nav>
+
+  <!-- 侧边菜单抽屉 -->
+  <div class="drawerOverlay" id="drawerOverlay">
+    <div class="drawerSheet">
+      <div style="padding:14px;border-bottom:1px solid var(--line);background:var(--card);display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:12px;font-weight:500">快捷侧栏</div>
+          <div style="font-size:8px;font-family:monospace;color:var(--muted)">MENU · AIRP OS</div>
+        </div>
+        <button id="closeDrawerBtn" type="button" style="font-size:16px;color:var(--muted)">×</button>
+      </div>
+      <div style="padding:12px;overflow-y:auto;flex:1">
+        <div class="drawerItem" data-act="api"><span>⚙</span><div><b>API 密钥管理</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">TIMELINE & CUSTOM APIS</div></div></div>
+        <div class="drawerItem" data-act="persona"><span>✦</span><div><b>人设与预设编辑</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">PERSONA & PROMPTS</div></div></div>
+        <div class="drawerItem" data-act="user"><span>○</span><div><b>用户设定</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">USER PROFILE</div></div></div>
+        <div class="drawerItem" data-act="space"><span>△</span><div><b>专属关系空间</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">RELATION SPACE & DIARY</div></div></div>
+        <div class="drawerItem" data-act="music"><span>♪</span><div><b>留声机白噪音曲库</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">VINYL PLAYLIST</div></div></div>
+        <div class="drawerItem" data-act="friends"><span>□</span><div><b>好友列表</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">FRIENDS LIST</div></div></div>
+        <div class="drawerItem" data-act="logs"><span>▤</span><div><b>查岗 / 后台记录</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">AUDIT LOGS</div></div></div>
+        <div class="drawerItem" data-act="avatar"><span>◉</span><div><b>更换头像</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">AVATAR SETTINGS</div></div></div>
+        <div class="drawerItem" data-act="wallpaper"><span>▦</span><div><b>更换背景壁纸</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">WALLPAPER</div></div></div>
+        <div class="drawerItem" data-act="theme"><span>◑</span><div><b id="themeToggleText">切换夜间模式</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">LIGHT / NIGHT THEME</div></div></div>
+        <div class="drawerItem" data-act="block"><span>✕</span><div><b id="blockToggleText" style="color:var(--danger)">拉黑联系人</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">BLOCK / UNBLOCK</div></div></div>
+      </div>
+    </div>
   </div>
 
-  <!-- 弹窗抽屉 -->
-  <div class="overlay" id="overlay">
-    <div class="modalSheet" id="modalSheet"></div>
+  <!-- API 弹窗 (自由填入，无任何预设推荐，历史密钥脱敏加密时间线) -->
+  <div class="modalOverlay" id="apiModal">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div><b style="font-size:12px">自定义 API 与历史记录</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">CUSTOM ENDPOINTS & TIMELINE</div></div>
+        <button data-close-modal type="button">×</button>
+      </div>
+      <div class="modalBody">
+        <div>
+          <div style="font-size:9px;font-family:monospace;color:var(--muted);margin-bottom:6px">已存历史密钥时间线 (点击切换激活，密钥加密脱敏)</div>
+          <div id="apiKeyHistoryList" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+        <hr style="border:0;border-top:1px solid var(--line-light);margin:0">
+        <div class="fieldBox"><label>接口标签 / LABEL</label><input id="newApiLabel" placeholder="例如: 我的主模型 / 办公代理"></div>
+        <div class="fieldBox"><label>端点地址 / ENDPOINT URL</label><input id="newApiEndpoint" placeholder="https://api.example.com/v1/chat/completions"></div>
+        <div class="fieldBox"><label>API 密钥 / API KEY (脱敏保存在本地)</label><input id="newApiKey" type="password" placeholder="sk-..."></div>
+        <div class="fieldBox"><label>模型名称 / MODEL ID</label><input id="newApiModel" placeholder="例如: deepseek-chat, gpt-4o, qwen-max"></div>
+        <button class="pillBtn" id="pingTestBtn" type="button" style="width:100%;padding:8px">测试填入端点连通性 (PING)</button>
+        <div id="pingRes" style="display:none;font-size:10px;font-family:monospace;padding:6px;border-radius:6px"></div>
+      </div>
+      <div class="modalBtns">
+        <button class="pillBtn" data-close-modal type="button">取消</button>
+        <button class="pillBtn dark" id="saveApiBtn" type="button">保存并激活</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Toast 提示 -->
+  <!-- 人设编辑弹窗 (带风格预设 & 系统设定词) -->
+  <div class="modalOverlay" id="personaModal">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div><b style="font-size:12px">人设与预设编辑</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">PRESETS & SYSTEM PROMPT</div></div>
+        <button data-close-modal type="button">×</button>
+      </div>
+      <div class="modalBody">
+        <div>
+          <div style="font-size:9px;font-family:monospace;color:var(--muted);margin-bottom:4px">一键载入风格预设</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+            <button class="pillBtn" id="preset1Btn" type="button" style="text-align:left">甜丧克制 · Melancholy</button>
+            <button class="pillBtn" id="preset2Btn" type="button" style="text-align:left">傲娇猫系 · Tsundere</button>
+            <button class="pillBtn" id="preset3Btn" type="button" style="text-align:left">深海知己 · Soulmate</button>
+            <button class="pillBtn" id="preset4Btn" type="button" style="text-align:left">极简诗笺 · Poet</button>
+          </div>
+        </div>
+        <div class="fieldBox"><label>伴侣姓名 / NAME</label><input id="editPersonaName" value="小熊"></div>
+        <div class="fieldBox"><label>头像直链 URL</label><input id="editPersonaAvatar"></div>
+        <div class="fieldBox"><label>关系定位 / RELATIONSHIP</label><input id="editPersonaRel" value="恋人"></div>
+        <div class="fieldBox"><label>签名寄语 / STATUS QUOTE</label><input id="editPersonaQuote" value="把今天妥帖地折叠起来，留一点空白给明日。"></div>
+        <div class="fieldBox"><label>模型随机度 / TEMPERATURE (<span id="tempVal">0.7</span>)</label><input type="range" min="0.2" max="1.2" step="0.05" value="0.7" id="editPersonaTemp" oninput="$('#tempVal').textContent=this.value"></div>
+        <div class="fieldBox"><label>系统提示词 (SYSTEM PROMPT)</label><textarea id="editPersonaSys" rows="4"></textarea></div>
+      </div>
+      <div class="modalBtns">
+        <button class="pillBtn" data-close-modal type="button">取消</button>
+        <button class="pillBtn dark" id="savePersonaBtn" type="button">保存人设</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用户设定弹窗 -->
+  <div class="modalOverlay" id="userModal">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div><b style="font-size:12px">用户个人设定</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">USER CONTEXT FOR AI</div></div>
+        <button data-close-modal type="button">×</button>
+      </div>
+      <div class="modalBody">
+        <div class="fieldBox"><label>我的称呼 / USER NAME</label><input id="editUserName" value="我"></div>
+        <div class="fieldBox"><label>希望 AI 了解你的特质 (注入对话上下文)</label><textarea id="editUserNotes" rows="3" placeholder="例如: 喜欢安静的夜晚，不喜欢被打扰，偶尔有些敏感..."></textarea></div>
+        <div class="fieldBox"><label>相伴天数 / DAYS</label><input id="editUserDays" type="number" value="7"></div>
+      </div>
+      <div class="modalBtns">
+        <button class="pillBtn" data-close-modal type="button">取消</button>
+        <button class="pillBtn dark" id="saveUserBtn" type="button">保存设定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 专属关系空间弹窗 -->
+  <div class="modalOverlay" id="spaceModal">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div><b style="font-size:12px">关系空间 · <span id="spaceRelTitle">恋人</span></b><div style="font-size:8px;font-family:monospace;color:var(--muted)">EXCLUSIVE RELATION SPACE</div></div>
+        <button data-close-modal type="button">×</button>
+      </div>
+      <div class="modalBody">
+        <div class="card">
+          <b id="spaceDaysCount">已连续打卡 7 天</b>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px" id="spaceMoodDisplay">今日心情：平静沉着</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="pillBtn" id="randomMoodBtn" type="button" style="flex:1">记录心情标签</button>
+          <button class="pillBtn dark" id="writeSpaceDiaryBtn" type="button" style="flex:1">写私密日记</button>
+        </div>
+        <div id="spaceDiariesList" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto"></div>
+      </div>
+      <div class="modalBtns">
+        <button class="pillBtn" data-close-modal type="button">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 留声机管理弹窗 -->
+  <div class="modalOverlay" id="musicModal">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div><b style="font-size:12px">留声机播放器</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">VINYL PLAYLIST</div></div>
+        <button data-close-modal type="button">×</button>
+      </div>
+      <div class="modalBody">
+        <div style="display:flex;justify-content:center;gap:12px;margin:8px 0">
+          <button class="pillBtn" id="mPrevBtn" type="button">‹‹ 上一首</button>
+          <button class="pillBtn dark" id="mPlayBtn" type="button">播放 / 暂停</button>
+          <button class="pillBtn" id="mNextBtn" type="button">下一首 ››</button>
+        </div>
+        <div class="fieldBox"><label>导入网络音频直链 (.mp3/.wav)</label><input id="newMusicUrl" placeholder="https://..."></div>
+        <div class="fieldBox"><label>歌曲名称</label><input id="newMusicTitle" placeholder="歌曲名"></div>
+        <button class="pillBtn dark" id="addMusicBtn" type="button">加入曲库</button>
+        <div id="playlistBox" style="display:flex;flex-direction:column;gap:4px;max-height:140px;overflow-y:auto"></div>
+      </div>
+      <div class="modalBtns"><button class="pillBtn" data-close-modal type="button">关闭</button></div>
+    </div>
+  </div>
+
+  <!-- 头像设置弹窗 -->
+  <div class="modalOverlay" id="avatarModal">
+    <div class="modalCard">
+      <div class="modalHead">
+        <b style="font-size:12px">更换头像</b>
+        <button data-close-modal type="button">×</button>
+      </div>
+      <div class="modalBody">
+        <div class="fieldBox"><label>更换目标</label><select id="avatarTarget"><option value="ai">AI 伴侣头像</option><option value="user">我的头像</option></select></div>
+        <div class="fieldBox"><label>网络图片 URL</label><input id="avatarUrlInput" placeholder="https://..."></div>
+        <div class="fieldBox"><label>或本地相册选取</label><input id="avatarFileInput" type="file" accept="image/*"></div>
+      </div>
+      <div class="modalBtns">
+        <button class="pillBtn" data-close-modal type="button">取消</button>
+        <button class="pillBtn dark" id="saveAvatarBtn" type="button">应用头像</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 背景壁纸弹窗 -->
+  <div class="modalOverlay" id="wallModal">
+    <div class="modalCard">
+      <div class="modalHead">
+        <b style="font-size:12px">背景壁纸</b>
+        <button data-close-modal type="button">×</button>
+      </div>
+      <div class="modalBody">
+        <div class="fieldBox"><label>壁纸网络直链 URL</label><input id="wallUrlInput" placeholder="https://..."></div>
+        <div class="fieldBox"><label>或从本地相册选取</label><input id="wallFileInput" type="file" accept="image/*"></div>
+        <button class="pillBtn" id="clearWallBtn" type="button" style="color:var(--danger)">清除壁纸</button>
+      </div>
+      <div class="modalBtns">
+        <button class="pillBtn" data-close-modal type="button">取消</button>
+        <button class="pillBtn dark" id="saveWallBtn" type="button">应用壁纸</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 装订时间书弹窗 -->
+  <div class="modalOverlay" id="bookModal">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div><b style="font-size:12px">装订新一页时间书</b><div style="font-size:8px;font-family:monospace;color:var(--muted)">CHRONICLE PAGE</div></div>
+        <button data-close-modal type="button">×</button>
+      </div>
+      <div class="modalBody">
+        <div class="fieldBox"><label>标题 / TITLE</label><input id="bookTitle" placeholder="例如: 灰调微风与无言时刻"></div>
+        <div class="fieldBox"><label>心境标签</label><input id="bookMood" value="静谧"></div>
+        <div class="fieldBox"><label>配图直链 URL (可选)</label><input id="bookImage" placeholder="https://..."></div>
+        <div class="fieldBox"><label>内容正文</label><textarea id="bookContent" rows="4" placeholder="写下此刻想存留的心情..."></textarea></div>
+      </div>
+      <div class="modalBtns">
+        <button class="pillBtn" data-close-modal type="button">取消</button>
+        <button class="pillBtn dark" id="saveBookBtn" type="button">装订入书</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 发布动态圈弹窗 -->
+  <div class="modalOverlay" id="momentModal">
+    <div class="modalCard">
+      <div class="modalHead">
+        <b style="font-size:12px">发布动态</b>
+        <button data-close-modal type="button">×</button>
+      </div>
+      <div class="modalBody">
+        <div class="fieldBox"><label>动态内容</label><textarea id="momentTextInput" rows="4" placeholder="写下此刻的心境..."></textarea></div>
+        <div class="fieldBox"><label>附图直链 URL (可选)</label><input id="momentImgInput" placeholder="https://..."></div>
+      </div>
+      <div class="modalBtns">
+        <button class="pillBtn" data-close-modal type="button">取消</button>
+        <button class="pillBtn dark" id="saveMomentBtn" type="button">发布</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加好友弹窗 -->
+  <div class="modalOverlay" id="friendModal">
+    <div class="modalCard">
+      <div class="modalHead"><b style="font-size:12px">添加好友</b><button data-close-modal type="button">×</button></div>
+      <div class="modalBody">
+        <div class="fieldBox"><label>好友昵称</label><input id="friendNameInput" placeholder="例如: 纸飞机"></div>
+        <div class="fieldBox"><label>个性备注</label><input id="friendNoteInput" placeholder="例如: 偶尔说晚安的人"></div>
+      </div>
+      <div class="modalBtns">
+        <button class="pillBtn" data-close-modal type="button">取消</button>
+        <button class="pillBtn dark" id="saveFriendBtn" type="button">添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 画报高清灯箱 Lightbox -->
+  <div class="modalOverlay" id="lightboxModal" style="background:rgba(0,0,0,.85)" onclick="this.classList.remove('show')">
+    <div style="max-width:340px;width:100%;background:var(--card);border-radius:14px;overflow:hidden;padding:10px" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <b style="font-size:11px" id="lightboxTitle">AESTHETIC LIGHTBOX</b>
+        <button onclick="$('#lightboxModal').classList.remove('show')" style="font-size:16px">×</button>
+      </div>
+      <img id="lightboxImg" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:8px">
+    </div>
+  </div>
+
+  <!-- 轻提示 Toast -->
   <div class="toast" id="toast"></div>
 </div>
 
 <script>
 (()=>{
 'use strict';
-
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
-// 本地存储键
-const STORE_KEY = 'airp_mobile_app_v3';
-const API_KEY_STORE = 'airp_api_config_v3';
-
-// 默认配置 (纯字符，无任何 emoji)
-const defaultState = {
-  theme: 'light',
-  peerName: '小熊',
-  peerAvatar: '',
-  myAvatar: '',
-  wallpaper: '',
-  blocked: false,
-  relation: '恋人',
-  relationSpace: {
-    days: 3,
-    lastCheckin: '',
-    moods: ['平静沉着'],
-    diaries: [{ id: '1', date: '昨天 23:45', text: '只要你在，这里就是属于我们的安静小站。' }]
-  },
-  music: [
-    { id: '1', title: 'little grey song', artist: 'airp local player', url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3' }
-  ],
-  musicIndex: 0,
-  musicPlaying: false,
-  moments: [
-    { id: '1', author: '小熊', time: '今天 00:12', text: '凌晨的风很轻，适合在静默中聆听自己的呼吸。', likes: 8, comments: 1, visibility: '公开' },
-    { id: '2', author: '小熊', time: '昨天 22:31', text: '把今天妥帖地折叠起来，留一点空白给明日。', likes: 12, comments: 3, visibility: '公开' }
-  ],
-  friends: [
-    { id: '1', name: '小熊', note: 'airp 核心伴侣' },
-    { id: '2', name: '纸飞机', note: '偶尔说晚安的人' },
-    { id: '3', name: '白噪音', note: '安静列表里的朋友' }
-  ],
-  chats: [], // 初始完全清空！不提前做完假对话，等待真实 API 流式输出
-  logs: [
-    { id: '1', time: '系统就绪', tag: 'BOOT', content: 'airp 全屏手机端界面已加载完成' },
-    { id: '2', time: '连接就绪', tag: 'READY', content: '实时流式 API 等待用户发送首条输入' }
-  ]
+const K = {
+  APIS: 'airp_v4_apis', CHATS: 'airp_v4_chats', PERSONA: 'airp_v4_persona', USER: 'airp_v4_user',
+  BOOK: 'airp_v4_book', MOMENTS: 'airp_v4_moments', FRIENDS: 'airp_v4_friends', MUSIC: 'airp_v4_music',
+  LOGS: 'airp_v4_logs', SPACE: 'airp_v4_space', THEME: 'airp_v4_theme', WALL: 'airp_v4_wall', BLOCKED: 'airp_v4_blocked'
 };
 
-const defaultApi = {
-  endpoint: 'https://api.deepseek.com/v1/chat/completions',
-  apiKey: '',
-  model: 'deepseek-chat',
-  systemPrompt: '你是 airp，一个克制、敏锐、温和的对话伴侣。你的文字精简而有温度，不用修饰过度的词藻，绝对不使用任何 emoji 表情符号。',
-  temperature: 0.7
-};
+function load(k, fallback){ try{ return JSON.parse(localStorage.getItem(k)) || fallback; }catch{ return fallback; } }
+function save(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
 
-function safeParse(s, fallback) {
-  try { return JSON.parse(s) || fallback; } catch { return fallback; }
-}
+let apis = load(K.APIS, []);
+let chats = load(K.CHATS, []);
+let persona = load(K.PERSONA, {
+  name: '小熊',
+  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+  relationship: '恋人',
+  statusQuote: '把今天妥帖地折叠起来，留一点空白给明日。',
+  temperature: 0.7,
+  systemPrompt: '你是 airp，一个拥有韩系ins极简甜酷气质的伴侣。语言克制温凉、句式偏短，严禁使用任何 emoji 表情符号。'
+});
+let userProfile = load(K.USER, {
+  name: '我',
+  avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80',
+  notes: '喜欢安静克制的对话，夜间习惯听白噪音。',
+  days: 7,
+  lastCheckin: ''
+});
+let timeBook = load(K.BOOK, [
+  { id: '1', date: '2026.09.10', title: '灰调微风与无言时刻', mood: '静谧', content: '只要你在，这里就是属于我们的安静小站。呼吸和文字重叠成同样的频率。', isFav: true },
+  { id: '2', date: '2026.09.09', title: '折叠一页白噪音', mood: '甜丧', content: '把杂乱思绪剪裁干净，留下了三两件值得记住的事：窗台雨珠、耳机贝斯，还有闪烁光标。', isFav: false }
+]);
+let moments = load(K.MOMENTS, [
+  { id: '1', author: '小熊', text: '凌晨的风很轻，适合在静默中聆听自己的呼吸。把白天的疲倦关在门外。', likes: 12, comments: [] }
+]);
+let friends = load(K.FRIENDS, [
+  { id: '1', name: '小熊', note: '核心伴侣' },
+  { id: '2', name: '纸飞机', note: '偶尔说晚安的人' },
+  { id: '3', name: '白噪音', note: '安静列表里的朋友' }
+]);
+let musicList = load(K.MUSIC, [
+  { id: '1', title: 'little grey song', artist: 'airp · lofi study', url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3' },
+  { id: '2', title: 'midnight rain drops', artist: 'ambient sound', url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=rain-and-nostalgia-chill-lofi-song-8493.mp3' }
+]);
+let logs = load(K.LOGS, [
+  { id: '1', time: '系统就绪', tag: 'BOOT', content: 'airp 甜酷极简完整系统已就绪' }
+]);
+let space = load(K.SPACE, {
+  diaries: [{ id: '1', date: '昨天 23:45', text: '只要你在，这里就是属于我们的安静小站。' }],
+  moods: ['平静沉着']
+});
 
-let state = { ...defaultState, ...safeParse(localStorage.getItem(STORE_KEY), {}) };
-let apiConfig = { ...defaultApi, ...safeParse(localStorage.getItem(API_KEY_STORE), {}) };
+let isNight = load(K.THEME, false);
+let wallpaper = load(K.WALL, '');
+let isBlocked = load(K.BLOCKED, false);
 
 let activeAbortController = null;
 let currentQuoting = null;
 let audio = new Audio();
-audio.preload = 'metadata';
+let currentTrackIdx = 0;
 
-function saveState() {
-  localStorage.setItem(STORE_KEY, JSON.stringify(state));
-}
-function saveApi() {
-  localStorage.setItem(API_KEY_STORE, JSON.stringify(apiConfig));
-}
-
-function toast(msg) {
-  const el = $('#toast');
-  el.textContent = msg;
-  el.classList.add('show');
+function toast(msg){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
   clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => el.classList.remove('show'), 2200);
+  toast.timer = setTimeout(()=> t.classList.remove('show'), 2200);
 }
 
-function addLog(tag, content) {
-  const now = new Date();
-  const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-  state.logs.unshift({ id: String(Date.now()), time, tag, content });
-  saveState();
-  if ($('#logsView').classList.contains('active')) renderLogs();
+function addLog(tag, content){
+  const d = new Date();
+  const time = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+  logs.unshift({ id: String(Date.now()), time, tag, content });
+  save(K.LOGS, logs);
+  if($('#viewLogs').classList.contains('active')) renderLogs();
 }
 
-function esc(s='') {
-  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function maskKey(k){
+  if(!k) return 'NONE';
+  const c = k.trim();
+  if(c.length <= 8) return '••••••••';
+  return c.slice(0, 4) + '••••••••' + c.slice(-4);
 }
 
-function avatarSvg(text='我') {
-  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" rx="28" fill="#d6d6d2"/><circle cx="50" cy="43" r="20" fill="#f5f5f1"/><path d="M25 82c7-20 43-20 50 0" fill="#f5f5f1"/><text x="50" y="92" text-anchor="middle" font-size="9" fill="#777">${esc(text).slice(0,2)}</text></svg>`
-  );
-}
+// 界面全局渲染
+function renderApp(){
+  document.documentElement.classList.toggle('night', isNight);
+  $('#themeToggleText').textContent = isNight ? '切换白间模式' : '切换夜间模式';
+  $('#blockToggleText').textContent = isBlocked ? '解除拉黑' : '拉黑联系人';
+  $('#phoneBox').style.setProperty('--wallpaper', wallpaper ? `url("${wallpaper}")` : 'none');
 
-function applyTheme() {
-  document.documentElement.classList.toggle('night', state.theme === 'dark');
-  document.documentElement.style.setProperty('--wallpaper', state.wallpaper ? `url("${state.wallpaper.replaceAll('"','\\"')}")` : 'none');
-  
-  $('#peerName').textContent = state.peerName + (state.blocked ? ' (已拉黑)' : '');
-  $('#homeChatName').textContent = state.peerName;
-  $('#peerAvatar').src = state.peerAvatar || avatarSvg(state.peerName);
-  $('#homeAvatar').src = state.peerAvatar || avatarSvg(state.peerName);
-  
-  if (state.relation) {
-    $('#relTag').style.display = 'inline-block';
-    $('#relTag').textContent = state.relation;
+  const activeApi = apis.find(a => a.isActive);
+  const badge = $('#statusApiBadge');
+  if(activeApi){
+    badge.textContent = `API · ${activeApi.model}`;
+    badge.classList.add('online');
+    $('#chatModelStatus').textContent = `STREAM · ${activeApi.model}`;
   } else {
-    $('#relTag').style.display = 'none';
+    badge.textContent = 'LOCAL';
+    badge.classList.remove('online');
+    $('#chatModelStatus').textContent = 'STREAM · LOCAL FALLBACK';
   }
 
-  const track = state.music[state.musicIndex] || defaultState.music[0];
-  $('#homeSong').textContent = track.title;
-  $('#homeArtist').textContent = track.artist;
-  $('#homeDisc').classList.toggle('play', !!state.musicPlaying);
-  $('#homeWave').classList.toggle('play', !!state.musicPlaying);
-  $('#homePlayBtn').textContent = state.musicPlaying ? '⏸' : '▶';
+  $('#homeAiName').textContent = persona.name + (isBlocked ? ' (已拉黑)' : '');
+  $('#homeAiRel').textContent = persona.relationship;
+  $('#homeAiAvatar').src = persona.avatar;
+  $('#chatAiName').textContent = persona.name;
+  $('#chatAiAvatar').src = persona.avatar;
+  $('#homeStatusQuote').textContent = persona.statusQuote;
+  $('#calRelDays').textContent = `/ DAY ${userProfile.days}`;
 
-  const hasApi = Boolean(apiConfig.endpoint && apiConfig.apiKey);
-  $('#connIndicator').classList.toggle('offline', !hasApi);
-  $('#peerSub').textContent = hasApi ? '在线 · 实时对话就绪' : '在线 · 点击配置 API';
+  const todayStr = new Date().toISOString().slice(0,10);
+  const isChecked = userProfile.lastCheckin === todayStr;
+  $('#checkinBtn').textContent = isChecked ? 'CHECKED ♡' : '♡ CHECK IN';
+  $('#checkinBtn').classList.toggle('done', isChecked);
+
+  const curTrack = musicList[currentTrackIdx] || musicList[0];
+  $('#homeTrackTitle').textContent = curTrack.title;
+  $('#homeTrackArtist').textContent = curTrack.artist;
+
+  $('#spaceRelTitle').textContent = persona.relationship;
+  $('#spaceDaysCount').textContent = `已相伴第 ${userProfile.days} 天`;
+  $('#spaceMoodDisplay').textContent = `今日心情：${space.moods[0] || '平静沉着'}`;
+
+  renderTimeBook();
+  renderMoments();
+  renderFriends();
+  renderLogs();
+  renderApiHistory();
+  renderPlaylist();
+  renderSpaceDiaries();
 }
 
-function go(viewName) {
-  $$('.view').forEach(v => v.classList.remove('active'));
-  const target = $('#' + viewName + 'View');
-  if (target) target.classList.add('active');
-  if (viewName === 'chat') renderChat();
-  if (viewName === 'moments') renderMoments();
-  if (viewName === 'friends') renderFriends();
-  if (viewName === 'logs') renderLogs();
-}
-
-$$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
-$('#chatBackBtn').onclick = () => go('home');
-
-/* 渲染聊天界面 */
-function renderChat() {
-  const box = $('#messages');
+// 星期条
+function setupWeekStrip(){
+  const box = $('#weekStrip');
   box.innerHTML = '';
-
-  if (state.chats.length === 0) {
-    const hasApi = Boolean(apiConfig.endpoint && apiConfig.apiKey);
-    box.innerHTML = `
-      <div class="chatEmptyState">
-        <div class="emptyLogo">+</div>
-        <div class="emptyTitle">airp 实时连接已就绪</div>
-        <div class="emptyDesc">${hasApi ? '在下方输入框中输入消息，将通过实时 API 流式输出生成回复。' : '当前尚未配置 API 端点或密钥，请先配置后开始实时对话。'}</div>
-        ${!hasApi ? '<button class="emptyBtn" id="emptyConfigBtn" type="button">前往配置 API 端点与密钥</button>' : ''}
-      </div>
-    `;
-    const btn = $('#emptyConfigBtn');
-    if (btn) btn.onclick = openApiModal;
-    return;
-  }
-
-  state.chats.forEach(m => {
-    if (m.type === 'system') {
-      const el = document.createElement('div');
-      el.className = 'systemMsg';
-      el.textContent = m.text;
-      box.appendChild(el);
-      return;
-    }
-
-    const isMine = m.sender === 'me';
+  const days = ['M','T','W','T','F','S','S'];
+  const cur = (new Date().getDay() + 6) % 7;
+  days.forEach((d, i)=>{
     const el = document.createElement('div');
-    el.className = `msg ${isMine ? 'mine' : 'other'}`;
-    el.dataset.id = m.id;
-
-    const av = document.createElement('img');
-    av.className = 'avatar';
-    av.style.width = '32px';
-    av.style.height = '32px';
-    av.src = isMine ? (state.myAvatar || avatarSvg('我')) : (state.peerAvatar || avatarSvg(state.peerName));
-
-    const wrap = document.createElement('div');
-    wrap.className = 'bubbleWrap';
-
-    let quoteHtml = m.quote ? `<div class="quoteBox">「${esc(m.quote.sender === 'me' ? '我' : state.peerName)}」：${esc(m.quote.text)}</div>` : '';
-    let cursorHtml = m.streaming ? `<span class="typingCursor"></span>` : '';
-
-    wrap.innerHTML = `
-      <div class="bubble">${quoteHtml}<span>${esc(m.text)}</span>${cursorHtml}</div>
-      <div class="time">${esc(m.time || '')}</div>
-    `;
-
-    el.append(av, wrap);
-
-    // 双击引用
-    el.addEventListener('dblclick', () => {
-      currentQuoting = { sender: m.sender, text: m.text.slice(0, 30) };
-      $('#quotingText').textContent = `引用「${m.sender === 'me' ? '我' : state.peerName}」：${currentQuoting.text}`;
-      $('#quotingBanner').style.display = 'flex';
-      $('#chatInput').focus();
-    });
-
+    el.className = `weekDayItem ${i === cur ? 'today' : ''}`;
+    el.textContent = d;
     box.appendChild(el);
   });
-
-  box.scrollTop = box.scrollHeight;
 }
 
+// 时间书渲染
+function renderTimeBook(){
+  const box = $('#timeBookList');
+  box.innerHTML = timeBook.map((b, i)=>`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;font-size:9px;font-family:monospace;color:var(--muted)">
+        <span>${b.date}</span>
+        <div style="display:flex;gap:8px">
+          <span>#${b.mood}</span>
+          <button onclick="toggleFavBook('${b.id}')">${b.isFav ? '❤️' : '♡'}</button>
+          <button onclick="delBook('${b.id}')" style="color:var(--danger)">✕</button>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:500;margin:4px 0 2px">${b.title}</div>
+      ${b.img ? `<img src="${b.img}" style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin:4px 0">` : ''}
+      <div style="font-size:11px;color:var(--muted);line-height:1.5">${b.content}</div>
+    </div>
+  `).join('');
+}
+window.toggleFavBook = id => {
+  const b = timeBook.find(x => x.id === id);
+  if(b){ b.isFav = !b.isFav; save(K.BOOK, timeBook); renderTimeBook(); }
+};
+window.delBook = id => {
+  timeBook = timeBook.filter(x => x.id !== id);
+  save(K.BOOK, timeBook);
+  renderTimeBook();
+  toast('已撕下该页时间书');
+};
+
+// 动态圈
+function renderMoments(){
+  const box = $('#momentsList');
+  box.innerHTML = moments.map(m=>`
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <img class="avatarSmall" src="${persona.avatar}">
+        <span style="font-size:12px;font-weight:500">${m.author}</span>
+      </div>
+      <div style="font-size:11px;line-height:1.6">${m.text}</div>
+      ${m.img ? `<img src="${m.img}" style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-top:6px">` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:6px;border-top:1px solid var(--line-light);font-size:9px;font-family:monospace;color:var(--muted)">
+        <button onclick="likeMoment('${m.id}')">♡ ${m.likes} 点赞</button>
+        <button onclick="commentMoment('${m.id}')">评论 (${m.comments.length})</button>
+      </div>
+      ${m.comments.length ? `<div style="margin-top:6px;padding:6px;background:rgba(0,0,0,.03);border-radius:6px;font-size:10px">${m.comments.map(c=>`<div><b>${c.user}:</b> ${c.text}</div>`).join('')}</div>` : ''}
+    </div>
+  `).join('');
+}
+window.likeMoment = id => {
+  const m = moments.find(x => x.id === id);
+  if(m){ m.likes++; save(K.MOMENTS, moments); renderMoments(); toast('已点赞'); }
+};
+window.commentMoment = id => {
+  const txt = prompt('输入评论内容：');
+  if(!txt) return;
+  const m = moments.find(x => x.id === id);
+  if(m){ m.comments.push({ user: userProfile.name, text: txt }); save(K.MOMENTS, moments); renderMoments(); toast('已评论'); }
+};
+
+// 好友
+function renderFriends(){
+  const box = $('#friendsList');
+  box.innerHTML = friends.map(f=>`
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:34px;height:34px;border-radius:50%;background:#e5e5ea;display:grid;place-items:center;font-size:12px">${f.name.slice(0,1)}</div>
+        <div><b style="font-size:12px">${f.name}</b><div style="font-size:9px;color:var(--muted)">${f.note}</div></div>
+      </div>
+      <button class="pillBtn" onclick="chatWithFriend('${f.name}')">聊天</button>
+    </div>
+  `).join('');
+}
+window.chatWithFriend = name => {
+  persona.name = name;
+  save(K.PERSONA, persona);
+  renderApp();
+  switchTab('Chat');
+  toast(`已切换与 ${name} 对话`);
+};
+
+// 查岗日志
+function renderLogs(){
+  const box = $('#logsList');
+  box.innerHTML = logs.map(l=>`
+    <div class="card" style="padding:8px 10px;font-size:10px;font-family:monospace">
+      <div style="display:flex;justify-content:space-between;color:var(--muted)"><span>[${l.tag}]</span><span>${l.time}</span></div>
+      <div style="margin-top:2px;color:var(--ink)">${l.content}</div>
+    </div>
+  `).join('');
+}
+$('#clearLogsBtn').onclick = () => { logs = []; save(K.LOGS, logs); renderLogs(); toast('已清空记录'); };
+
+// 关系空间日记
+function renderSpaceDiaries(){
+  const box = $('#spaceDiariesList');
+  box.innerHTML = space.diaries.map((d, i)=>`
+    <div style="padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-size:10px">
+      <div style="display:flex;justify-content:space-between;color:var(--muted)"><span>${d.date}</span><button onclick="delSpaceDiary(${i})">✕</button></div>
+      <div style="margin-top:2px">${d.text}</div>
+    </div>
+  `).join('');
+}
+window.delSpaceDiary = i => { space.diaries.splice(i, 1); save(K.SPACE, space); renderSpaceDiaries(); };
+
+$('#randomMoodBtn').onclick = () => {
+  const list = ['平静沉着','微风清朗','独处安宁','心怀期待','轻盈慢节奏'];
+  const pick = list[Math.floor(Math.random()*list.length)];
+  space.moods.unshift(pick);
+  save(K.SPACE, space);
+  renderApp();
+  toast(`已记录心情: ${pick}`);
+};
+$('#writeSpaceDiaryBtn').onclick = () => {
+  const t = prompt('写下给彼此的话语：');
+  if(!t) return;
+  const d = new Date();
+  space.diaries.unshift({ id: String(Date.now()), date: `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`, text: t });
+  save(K.SPACE, space);
+  renderSpaceDiaries();
+  toast('已存入关系日记');
+};
+
+// 聊天渲染与双击引用
+function renderChats(){
+  const box = $('#messagesBox');
+  box.innerHTML = chats.map(m=>`
+    <div class="msgRow ${m.sender === 'user' ? 'mine' : 'other'}" data-msg-id="${m.id}">
+      <img class="avatarSmall" src="${m.sender === 'user' ? userProfile.avatar : persona.avatar}">
+      <div>
+        <div class="msgBubble">
+          ${m.quote ? `<div class="quotePreview">「${m.quote.sender}」：${m.quote.text}</div>` : ''}
+          <span>${m.text}</span>${m.streaming ? '<span class="typingCursor"></span>' : ''}
+        </div>
+        <div class="msgTime">${m.time}</div>
+      </div>
+    </div>
+  `).join('');
+  box.scrollTop = box.scrollHeight;
+  if(chats.length > 0){
+    $('#homeLastMsg').textContent = chats[chats.length-1].text.slice(0, 24);
+  }
+
+  // 绑定双击引用
+  $$('.msgRow').forEach(el => {
+    el.ondblclick = () => {
+      const id = el.dataset.msgId;
+      const m = chats.find(x => x.id === id);
+      if(m){
+        currentQuoting = { sender: m.sender === 'user' ? userProfile.name : persona.name, text: m.text.slice(0, 30) };
+        $('#quotingText').textContent = `引用「${currentQuoting.sender}」: ${currentQuoting.text}`;
+        $('#quotingBanner').style.display = 'flex';
+        $('#chatInput').focus();
+      }
+    };
+  });
+}
 $('#cancelQuoteBtn').onclick = () => {
   currentQuoting = null;
   $('#quotingBanner').style.display = 'none';
 };
 
-/* 快捷标点 */
-$$('#quickBar button').forEach(btn => {
-  btn.onclick = () => {
-    const char = btn.dataset.ins;
-    $('#chatInput').value += char;
-    $('#chatInput').focus();
-  };
-});
-
-/* 弹窗抽屉管理 */
-function openModal(html) {
-  $('#modalSheet').innerHTML = html;
-  $('#overlay').classList.add('show');
-}
-function closeModal() {
-  $('#overlay').classList.remove('show');
-}
-$('#overlay').addEventListener('click', e => {
-  if (e.target === $('#overlay')) closeModal();
-});
-
-/* API 设置弹窗 */
-function openApiModal() {
-  openModal(`
-    <div class="modalHead">
-      <h3>API 接口设置</h3>
-      <button class="closeBtn" data-close type="button">×</button>
-    </div>
-    <div class="field">
-      <label>快速填入服务商规范</label>
-      <select id="apiPresetSelect">
-        <option value="" disabled selected>选择预设配置...</option>
-        <option value="deepseek">DeepSeek 官方 (api.deepseek.com)</option>
-        <option value="openai">OpenAI 官方 (api.openai.com)</option>
-        <option value="silicon">SiliconFlow 硅基流动</option>
-        <option value="moonshot">Moonshot 月之暗面</option>
-        <option value="ollama">Ollama 本地运行 (localhost:11434)</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>API 端点地址 (Endpoint URL)</label>
-      <input id="apiEndpointInput" value="${esc(apiConfig.endpoint)}" placeholder="https://api.deepseek.com/v1/chat/completions">
-      <div class="fieldHint">兼容 OpenAI 规范的 /chat/completions 接口</div>
-    </div>
-    <div class="field">
-      <label>API 密钥 (API Key)</label>
-      <input id="apiKeyInput" type="password" value="${esc(apiConfig.apiKey)}" placeholder="输入 API Key (如 sk-...)">
-      <div class="fieldHint">保存在当前设备浏览器本地，绝对不会上传到第三方服务器</div>
-    </div>
-    <div class="field">
-      <label>模型名称 (Model)</label>
-      <input id="apiModelInput" value="${esc(apiConfig.model)}" placeholder="例如: deepseek-chat, gpt-4o-mini">
-    </div>
-    <div class="field">
-      <label>系统提示词 (System Prompt)</label>
-      <textarea id="apiSystemInput" rows="3">${esc(apiConfig.systemPrompt)}</textarea>
-    </div>
-    <div style="margin:12px 0">
-      <button class="miniBtn" id="testApiBtn" type="button" style="width:100%;padding:9px">测试接口连通性</button>
-      <div id="testResultBox" style="margin-top:8px;font-size:11px;display:none"></div>
-    </div>
-    <div class="modalBtns">
-      <button data-close type="button">取消</button>
-      <button class="primary" id="saveApiBtn" type="button">保存配置</button>
-    </div>
-  `);
-
-  $('#apiPresetSelect').onchange = e => {
-    const val = e.target.value;
-    if (val === 'deepseek') {
-      $('#apiEndpointInput').value = 'https://api.deepseek.com/v1/chat/completions';
-      $('#apiModelInput').value = 'deepseek-chat';
-    } else if (val === 'openai') {
-      $('#apiEndpointInput').value = 'https://api.openai.com/v1/chat/completions';
-      $('#apiModelInput').value = 'gpt-4o-mini';
-    } else if (val === 'silicon') {
-      $('#apiEndpointInput').value = 'https://api.siliconflow.cn/v1/chat/completions';
-      $('#apiModelInput').value = 'deepseek-ai/DeepSeek-V3';
-    } else if (val === 'moonshot') {
-      $('#apiEndpointInput').value = 'https://api.moonshot.cn/v1/chat/completions';
-      $('#apiModelInput').value = 'moonshot-v1-8k';
-    } else if (val === 'ollama') {
-      $('#apiEndpointInput').value = 'http://localhost:11434/v1/chat/completions';
-      $('#apiModelInput').value = 'llama3.2';
-    }
-    toast('已应用预设');
-  };
-
-  $('#saveApiBtn').onclick = () => {
-    apiConfig.endpoint = $('#apiEndpointInput').value.trim();
-    apiConfig.apiKey = $('#apiKeyInput').value.trim();
-    apiConfig.model = $('#apiModelInput').value.trim();
-    apiConfig.systemPrompt = $('#apiSystemInput').value;
-    saveApi();
-    applyTheme();
-    closeModal();
-    addLog('CONFIG', `更新 API 配置: ${apiConfig.endpoint} [${apiConfig.model}]`);
-    toast('API 配置已保存');
-  };
-
-  $('#testApiBtn').onclick = async () => {
-    const btn = $('#testApiBtn');
-    const resBox = $('#testResultBox');
-    btn.disabled = true;
-    btn.textContent = '测试中...';
-    resBox.style.display = 'none';
-
-    try {
-      const endpoint = $('#apiEndpointInput').value.trim();
-      const key = $('#apiKeyInput').value.trim();
-      const model = $('#apiModelInput').value.trim();
-      const startTime = Date.now();
-
-      const headers = { 'Content-Type': 'application/json' };
-      if (key) headers['Authorization'] = `Bearer ${key}`;
-
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          model,
-          messages: [{ role: 'user', content: 'Ping' }],
-          max_tokens: 5,
-          stream: false
-        })
-      });
-
-      const latency = Date.now() - startTime;
-      if (res.ok) {
-        resBox.style.display = 'block';
-        resBox.style.color = '#047857';
-        resBox.textContent = `连通成功 (${latency}ms)，端点响应正常。`;
-      } else {
-        const errText = await res.text();
-        resBox.style.display = 'block';
-        resBox.style.color = '#b91c1c';
-        resBox.textContent = `HTTP ${res.status}: ${errText.slice(0, 100)}`;
-      }
-    } catch (err) {
-      resBox.style.display = 'block';
-      resBox.style.color = '#b91c1c';
-      resBox.textContent = `连接失败: ${err.message} (若跨域受限，请确认服务端已允许 CORS)`;
-    } finally {
-      btn.disabled = false;
-      btn.textContent = '测试接口连通性';
-    }
-  };
-}
-
-$('#homeSettingsBtn').onclick = openApiModal;
-
-/* 菜单与各功能弹窗 */
-$('#chatMenuBtn').onclick = () => {
-  openModal(`
-    <div class="modalHead">
-      <h3>快捷功能与设置</h3>
-      <button class="closeBtn" data-close type="button">×</button>
-    </div>
-    <div class="menuGrid">
-      <button data-action="api"><span style="font-size:16px">⚙</span><span>API 设置</span></button>
-      <button data-action="music"><span style="font-size:16px">♪</span><span>留声机</span></button>
-      <button data-action="moments"><span style="font-size:16px">×</span><span>朋友圈</span></button>
-      <button data-action="friends"><span style="font-size:16px">□</span><span>好友列表</span></button>
-      <button data-action="logs"><span style="font-size:16px">▤</span><span>查岗记录</span></button>
-      <button data-action="relation"><span style="font-size:16px">△</span><span>建立关系</span></button>
-      <button data-action="space"><span style="font-size:16px">○</span><span>关系空间</span></button>
-      <button data-action="remark"><span style="font-size:16px">✎</span><span>修改备注</span></button>
-      <button data-action="avatar"><span style="font-size:16px">◉</span><span>更换头像</span></button>
-      <button data-action="wallpaper"><span style="font-size:16px">▦</span><span>更换壁纸</span></button>
-      <button data-action="theme"><span style="font-size:16px">◑</span><span>${state.theme === 'dark' ? '白间模式' : '夜间模式'}</span></button>
-      <button data-action="clearChat"><span style="font-size:16px">⟳</span><span>清空聊天</span></button>
-    </div>
-    <div class="divider"></div>
-    <button class="miniBtn" data-action="block" style="width:100%;color:${state.blocked ? 'var(--ink)' : 'var(--danger)'};padding:10px">
-      ${state.blocked ? '解除拉黑' : '拉黑联系人'}
-    </button>
-  `);
-};
-
-$('#modalSheet').addEventListener('click', e => {
-  if (e.target.closest('[data-close]')) {
-    closeModal();
+// 历史 API 列表
+function renderApiHistory(){
+  const box = $('#apiKeyHistoryList');
+  if(apis.length === 0){
+    box.innerHTML = '<div style="font-size:10px;color:var(--muted);text-align:center;padding:8px">暂无历史密钥，请在下方自由填入</div>';
     return;
   }
-  const btn = e.target.closest('[data-action]');
-  if (!btn) return;
-  const action = btn.dataset.action;
-  closeModal();
-
-  if (action === 'api') openApiModal();
-  else if (action === 'music') openMusicModal();
-  else if (action === 'moments') go('moments');
-  else if (action === 'friends') go('friends');
-  else if (action === 'logs') go('logs');
-  else if (action === 'relation') openRelationModal();
-  else if (action === 'space') openSpaceModal();
-  else if (action === 'remark') openRemarkModal();
-  else if (action === 'avatar') openAvatarModal();
-  else if (action === 'wallpaper') openWallpaperModal();
-  else if (action === 'theme') {
-    state.theme = state.theme === 'dark' ? 'light' : 'dark';
-    saveState();
-    applyTheme();
-    toast(state.theme === 'dark' ? '已切换至夜间模式' : '已切换至白间模式');
-  } else if (action === 'clearChat') {
-    state.chats = [];
-    saveState();
-    renderChat();
-    addLog('CLEAR', '清空本地聊天记录');
-    toast('聊天记录已清空');
-  } else if (action === 'block') {
-    state.blocked = !state.blocked;
-    saveState();
-    applyTheme();
-    toast(state.blocked ? '已拉黑联系人' : '已解除拉黑');
-  }
-});
-
-$('#chatToolBtn').onclick = () => $('#chatMenuBtn').click();
-$('#chatTitleInfo').onclick = () => $('#chatMenuBtn').click();
-
-/* 备注修改 */
-function openRemarkModal() {
-  openModal(`
-    <div class="modalHead"><h3>修改备注名</h3><button class="closeBtn" data-close type="button">×</button></div>
-    <div class="field"><label>联系人备注</label><input id="remarkInput" value="${esc(state.peerName)}"></div>
-    <div class="modalBtns"><button data-close type="button">取消</button><button class="primary" id="saveRemarkBtn" type="button">保存</button></div>
-  `);
-  $('#saveRemarkBtn').onclick = () => {
-    state.peerName = $('#remarkInput').value.trim() || '小熊';
-    saveState();
-    applyTheme();
-    closeModal();
-    toast(`备注已修改为 ${state.peerName}`);
-  };
-}
-
-/* 更换头像 */
-function openAvatarModal() {
-  openModal(`
-    <div class="modalHead"><h3>头像设置</h3><button class="closeBtn" data-close type="button">×</button></div>
-    <div class="field"><label>选择对象</label><select id="avatarWho"><option value="peer">对方头像</option><option value="me">我的头像</option></select></div>
-    <div class="field"><label>图片 URL</label><input id="avatarUrl" placeholder="https://..."></div>
-    <div class="field"><label>本地相册图片</label><input id="avatarFile" type="file" accept="image/*"></div>
-    <div class="modalBtns"><button data-close type="button">取消</button><button class="primary" id="saveAvatarBtn" type="button">保存</button></div>
-  `);
-  $('#saveAvatarBtn').onclick = () => {
-    const who = $('#avatarWho').value;
-    const url = $('#avatarUrl').value.trim();
-    const file = $('#avatarFile').files[0];
-    const done = src => {
-      if (who === 'peer') state.peerAvatar = src;
-      else state.myAvatar = src;
-      saveState();
-      applyTheme();
-      closeModal();
-      toast('头像已保存');
-    };
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => done(reader.result);
-      reader.readAsDataURL(file);
-    } else done(url);
-  };
-}
-
-/* 更换壁纸 */
-function openWallpaperModal() {
-  openModal(`
-    <div class="modalHead"><h3>聊天背景壁纸</h3><button class="closeBtn" data-close type="button">×</button></div>
-    <div class="field"><label>图片网络直链 URL</label><input id="wallUrl" value="${esc(state.wallpaper)}" placeholder="https://..."></div>
-    <div class="field"><label>或选取本地相册图片</label><input id="wallFile" type="file" accept="image/*"></div>
-    <div class="modalBtns">
-      <button id="clearWallBtn" type="button">清除壁纸</button>
-      <button class="primary" id="saveWallBtn" type="button">应用壁纸</button>
-    </div>
-  `);
-  $('#clearWallBtn').onclick = () => {
-    state.wallpaper = '';
-    saveState();
-    applyTheme();
-    closeModal();
-    toast('已清除壁纸');
-  };
-  $('#saveWallBtn').onclick = () => {
-    const url = $('#wallUrl').value.trim();
-    const file = $('#wallFile').files[0];
-    const done = src => {
-      state.wallpaper = src;
-      saveState();
-      applyTheme();
-      closeModal();
-      toast('壁纸已应用');
-    };
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => done(reader.result);
-      reader.readAsDataURL(file);
-    } else done(url);
-  };
-}
-
-/* 关系空间 */
-function openRelationModal() {
-  openModal(`
-    <div class="modalHead"><h3>建立关系申请</h3><button class="closeBtn" data-close type="button">×</button></div>
-    <div class="field">
-      <label>选择关系类型</label>
-      <select id="relationSelect">
-        <option>恋人</option><option>朋友</option><option>基友</option><option>闺蜜</option><option>家人</option><option>知己</option>
-      </select>
-    </div>
-    <div class="modalBtns"><button data-close type="button">取消</button><button class="primary" id="sendRelBtn" type="button">建立关系</button></div>
-  `);
-  $('#sendRelBtn').onclick = () => {
-    const rel = $('#relationSelect').value;
-    state.relation = rel;
-    state.relationSpace.relation = rel;
-    state.chats.push({
-      id: String(Date.now()),
-      sender: 'system',
-      type: 'system',
-      text: `你们已正式建立「${rel}」关系，已开启专属空间。`
-    });
-    saveState();
-    applyTheme();
-    closeModal();
-    renderChat();
-    toast(`已建立「${rel}」关系`);
-  };
-}
-
-function openSpaceModal() {
-  const space = state.relationSpace;
-  const mood = space.moods[0] || '暂无心情记录';
-  openModal(`
-    <div class="modalHead"><h3>关系空间 · ${esc(state.relation || '恋人')}</h3><button class="closeBtn" data-close type="button">×</button></div>
-    <div class="dateCard" style="margin-bottom:14px">
-      <b>已连续打卡 ${space.days} 天</b>
-      <div style="font-size:11px;color:var(--muted);margin:6px 0 12px">今日心情：${esc(mood)}</div>
-      <button class="sendBtn" id="checkinBtn" type="button" style="width:100%;height:36px">今日打卡记录</button>
-    </div>
-    <div class="modalBtns" style="margin-top:0;margin-bottom:14px">
-      <button id="randomMoodBtn" type="button">随机心情标签</button>
-      <button id="writeDiaryBtn" type="button">写日记</button>
-    </div>
-    <div style="max-height:160px;overflow-y:auto">
-      ${space.diaries.map((d,i)=>`
-        <div class="logItem">
-          <div class="logHeader"><span>${esc(d.date)}</span><button data-del-diary="${i}" style="font-size:10px;color:var(--muted)">删除</button></div>
-          <div>${esc(d.text)}</div>
-        </div>
-      `).join('')}
-    </div>
-    <div class="divider"></div>
-    <button class="miniBtn" id="clearRelBtn" style="width:100%;color:var(--danger);padding:9px" type="button">解除关系并重置空间</button>
-  `);
-
-  $('#checkinBtn').onclick = () => {
-    const today = new Date().toISOString().slice(0,10);
-    if (space.lastCheckin === today) {
-      toast('今日已完成打卡');
-    } else {
-      space.days++;
-      space.lastCheckin = today;
-      saveState();
-      toast('今日打卡成功');
-      openSpaceModal();
-    }
-  };
-
-  $('#randomMoodBtn').onclick = () => {
-    const list = ['平静沉着','适度独处','慢节奏','心怀期待','微风清朗','静心阅读','轻盈安宁'];
-    const pick = list[Math.floor(Math.random()*list.length)];
-    space.moods.unshift(pick);
-    saveState();
-    toast(`已记录心情：${pick}`);
-    openSpaceModal();
-  };
-
-  $('#writeDiaryBtn').onclick = () => {
-    openModal(`
-      <div class="modalHead"><h3>写日记</h3><button class="closeBtn" data-close type="button">×</button></div>
-      <div class="field"><textarea id="diaryInput" placeholder="写下属于彼此的话语..."></textarea></div>
-      <div class="modalBtns"><button data-close type="button">取消</button><button class="primary" id="saveDiaryBtn" type="button">发布日记</button></div>
-    `);
-    $('#saveDiaryBtn').onclick = () => {
-      const txt = $('#diaryInput').value.trim();
-      if (!txt) return;
-      const now = new Date();
-      const dateStr = `${now.getMonth()+1}月${now.getDate()}日 ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-      space.diaries.unshift({ id: String(Date.now()), date: dateStr, text: txt });
-      saveState();
-      toast('日记已存入关系空间');
-      openSpaceModal();
-    };
-  };
-
-  $$('[data-del-diary]').forEach(btn => {
-    btn.onclick = () => {
-      const idx = Number(btn.dataset.delDiary);
-      space.diaries.splice(idx, 1);
-      saveState();
-      toast('日记已删除');
-      openSpaceModal();
-    };
-  });
-
-  $('#clearRelBtn').onclick = () => {
-    state.relation = '';
-    state.relationSpace = { days: 0, lastCheckin: '', moods: [], diaries: [] };
-    saveState();
-    applyTheme();
-    closeModal();
-    toast('关系已解除');
-  };
-}
-
-/* 留声机播放器 */
-function openMusicModal() {
-  const current = state.music[state.musicIndex] || defaultState.music[0];
-  openModal(`
-    <div class="modalHead"><h3>留声机 · 播放器</h3><button class="closeBtn" data-close type="button">×</button></div>
-    <div class="turntable" style="margin-bottom:16px">
-      <div class="disc ${state.musicPlaying ? 'play' : ''}"></div>
-      <div class="turnInfo">
-        <b>${esc(current.title)}</b>
-        <small>${esc(current.artist)}</small>
-        <div class="wave ${state.musicPlaying ? 'play' : ''}"><i></i><i></i><i></i><i></i><i></i></div>
+  box.innerHTML = apis.map(a=>`
+    <div class="card" style="padding:8px 10px;cursor:pointer;background:${a.isActive ? 'var(--primary)' : 'var(--card)'};color:${a.isActive ? 'var(--bg)' : 'var(--ink)'}" onclick="activateApi('${a.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b style="font-size:11px">${a.label} · ${a.model}</b>
+        <button onclick="event.stopPropagation();delApi('${a.id}')" style="font-size:10px;color:${a.isActive ? '#888' : '#bbb'}">✕</button>
       </div>
-    </div>
-    <div style="display:flex;justify-content:center;gap:16px;margin:12px 0">
-      <button class="toolBtn" id="mPrevBtn" type="button">‹‹</button>
-      <button class="miniBtn primary" id="mPlayBtn" style="padding:8px 24px;font-size:13px" type="button">${state.musicPlaying ? '暂停' : '播放'}</button>
-      <button class="toolBtn" id="mNextBtn" type="button">››</button>
-    </div>
-    <div class="field"><label>导入网络音频直链 (.mp3 / .m4a)</label><input id="importMusicUrl" placeholder="https://..."></div>
-    <div class="field"><label>歌曲名</label><input id="importMusicTitle" placeholder="歌曲名"></div>
-    <button class="miniBtn" id="importMusicBtn" type="button" style="width:100%;padding:9px;margin-bottom:14px">加入列表</button>
-    <div style="max-height:140px;overflow-y:auto">
-      ${state.music.map((m,i)=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 4px;border-bottom:1px solid var(--line);font-size:12px">
-          <div style="flex:1;cursor:pointer" data-pick-music="${i}">
-            <b>${esc(m.title)}</b> <small style="color:var(--muted)">${esc(m.artist)}</small>
-          </div>
-          <button data-del-music="${i}" style="color:var(--muted);font-size:11px">删</button>
-        </div>
-      `).join('')}
-    </div>
-  `);
-
-  $('#mPlayBtn').onclick = () => {
-    toggleMusic();
-    openMusicModal();
-  };
-  $('#mPrevBtn').onclick = () => {
-    state.musicIndex = (state.musicIndex - 1 + state.music.length) % state.music.length;
-    playMusicTrack(state.musicIndex);
-    openMusicModal();
-  };
-  $('#mNextBtn').onclick = () => {
-    state.musicIndex = (state.musicIndex + 1) % state.music.length;
-    playMusicTrack(state.musicIndex);
-    openMusicModal();
-  };
-  $('#importMusicBtn').onclick = () => {
-    const url = $('#importMusicUrl').value.trim();
-    const title = $('#importMusicTitle').value.trim() || '未命名音乐';
-    if (!url) { toast('请输入直链地址'); return; }
-    state.music.push({ id: String(Date.now()), title, artist: '网络音乐', url });
-    saveState();
-    toast('已添加歌曲');
-    openMusicModal();
-  };
-  $$('[data-pick-music]').forEach(b => {
-    b.onclick = () => {
-      playMusicTrack(Number(b.dataset.pickMusic));
-      openMusicModal();
-    };
-  });
-  $$('[data-del-music]').forEach(b => {
-    b.onclick = () => {
-      if (state.music.length <= 1) { toast('列表至少保留一首'); return; }
-      state.music.splice(Number(b.dataset.delMusic), 1);
-      state.musicIndex = 0;
-      saveState();
-      openMusicModal();
-    };
-  });
-}
-
-function toggleMusic() {
-  const track = state.music[state.musicIndex];
-  if (!track || !track.url) {
-    openMusicModal();
-    toast('当前歌曲无音频直链');
-    return;
-  }
-  if (state.musicPlaying) {
-    audio.pause();
-    state.musicPlaying = false;
-    applyTheme();
-    toast('已暂停');
-  } else {
-    audio.src = track.url;
-    audio.play().then(() => {
-      state.musicPlaying = true;
-      applyTheme();
-      toast('开始播放');
-    }).catch(() => {
-      state.musicPlaying = false;
-      applyTheme();
-      toast('播放失败，请检查直链有效性');
-    });
-  }
-}
-
-function playMusicTrack(idx) {
-  state.musicIndex = idx;
-  const track = state.music[idx];
-  if (track && track.url) {
-    audio.src = track.url;
-    audio.play().then(() => {
-      state.musicPlaying = true;
-      applyTheme();
-    }).catch(() => {
-      state.musicPlaying = false;
-      applyTheme();
-    });
-  }
-}
-
-$('#homePlayBtn').onclick = toggleMusic;
-$('#homeMusicInfo').onclick = openMusicModal;
-$('#homeDisc').onclick = openMusicModal;
-
-/* 朋友圈与好友 */
-function renderMoments() {
-  $('#momentsList').innerHTML = state.moments.map(m => `
-    <article class="momentCard">
-      <div class="momentHead">
-        <img class="avatar" src="${m.author === '我' ? (state.myAvatar || avatarSvg('我')) : (state.peerAvatar || avatarSvg(m.author))}" style="width:34px;height:34px">
-        <div><b>${esc(m.author)}</b><small>${esc(m.time)} · ${esc(m.visibility || '公开')}</small></div>
-      </div>
-      <p class="momentBody">${esc(m.text)}</p>
-      <div class="momentActions">
-        <button data-like="${m.id}" type="button">赞 ${m.likes}</button>
-        <button type="button">评论 ${m.comments}</button>
-      </div>
-    </article>
-  `).join('');
-
-  $$('[data-like]').forEach(b => {
-    b.onclick = () => {
-      const id = b.dataset.like;
-      const m = state.moments.find(x => x.id === id);
-      if (m) {
-        m.likes++;
-        saveState();
-        renderMoments();
-        toast('已点赞');
-      }
-    };
-  });
-}
-
-$('#addMomentBtn').onclick = () => {
-  openModal(`
-    <div class="modalHead"><h3>发布朋友圈</h3><button class="closeBtn" data-close type="button">×</button></div>
-    <div class="field"><textarea id="momentInput" placeholder="写下这一刻的心境..."></textarea></div>
-    <div class="modalBtns"><button data-close type="button">取消</button><button class="primary" id="pubMomentBtn" type="button">发布</button></div>
-  `);
-  $('#pubMomentBtn').onclick = () => {
-    const t = $('#momentInput').value.trim();
-    if (!t) return;
-    state.moments.unshift({ id: String(Date.now()), author: '我', time: '刚刚', text: t, likes: 0, comments: 0, visibility: '公开' });
-    saveState();
-    closeModal();
-    renderMoments();
-    toast('已发布朋友圈');
-  };
-};
-
-function renderFriends() {
-  $('#friendsList').innerHTML = state.friends.map(f => `
-    <div class="friendRow">
-      <img class="avatar" src="${avatarSvg(f.name)}" style="width:36px;height:36px">
-      <div class="grow"><b>${esc(f.name)}</b><small>${esc(f.note)}</small></div>
-      <button class="miniBtn primary" data-chat-friend="${esc(f.name)}" type="button">聊天</button>
-    </div>
-  `).join('');
-
-  $$('[data-chat-friend]').forEach(b => {
-    b.onclick = () => {
-      state.peerName = b.dataset.chatFriend;
-      saveState();
-      applyTheme();
-      go('chat');
-      toast(`已切换与 ${state.peerName} 对话`);
-    };
-  });
-}
-
-$('#addFriendBtn').onclick = () => {
-  openModal(`
-    <div class="modalHead"><h3>添加联系人</h3><button class="closeBtn" data-close type="button">×</button></div>
-    <div class="field"><label>姓名</label><input id="friendNameInput" placeholder="例如: 纸飞机"></div>
-    <div class="field"><label>备注</label><input id="friendNoteInput" placeholder="例如: 偶尔说晚安的人"></div>
-    <div class="modalBtns"><button data-close type="button">取消</button><button class="primary" id="saveFriendBtn" type="button">添加</button></div>
-  `);
-  $('#saveFriendBtn').onclick = () => {
-    const name = $('#friendNameInput').value.trim();
-    const note = $('#friendNoteInput').value.trim() || '新朋友';
-    if (!name) return;
-    state.friends.push({ id: String(Date.now()), name, note });
-    saveState();
-    closeModal();
-    renderFriends();
-    toast(`已添加好友 ${name}`);
-  };
-};
-
-function renderLogs() {
-  $('#logsList').innerHTML = state.logs.map(l => `
-    <div class="logItem">
-      <div class="logHeader"><span>${esc(l.tag)}</span><span>${esc(l.time)}</span></div>
-      <div>${esc(l.content)}</div>
+      <div style="font-size:9px;font-family:monospace;opacity:.7;margin-top:2px">${a.endpoint}</div>
+      <div style="font-size:8px;font-family:monospace;opacity:.5;margin-top:2px">KEY: ${maskKey(a.fullKey)} · ${a.createdAt}</div>
     </div>
   `).join('');
 }
-$('#clearLogsBtn').onclick = () => {
-  state.logs = [];
-  saveState();
-  renderLogs();
-  toast('后台记录已清空');
+window.activateApi = id => {
+  apis.forEach(a => a.isActive = (a.id === id));
+  save(K.APIS, apis);
+  renderApp();
+  addLog('API_SWITCH', `激活端点: ${id}`);
+  toast('已切换激活该 API');
+};
+window.delApi = id => {
+  apis = apis.filter(a => a.id !== id);
+  save(K.APIS, apis);
+  renderApp();
+  toast('已删除历史记录');
 };
 
-/* 核心：真实实时流式发送与响应 */
-function nowHM() {
-  const d = new Date();
-  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}
-
-async function sendMessage() {
+// 核心流式对话 (兼容各种规范，绝无硬编码推荐)
+async function sendChatMessage(){
   const input = $('#chatInput');
   const text = input.value.trim();
-  if (!text) return;
-  if (state.blocked) { toast('已拉黑联系人，无法发送消息'); return; }
+  if(!text) return;
+  if(isBlocked){ toast('当前联系人处于拉黑状态'); return; }
 
-  // 1. 压入用户消息
-  const userMsg = {
-    id: String(Date.now()),
-    sender: 'me',
-    type: 'text',
-    text,
-    time: nowHM(),
-    quote: currentQuoting ? { ...currentQuoting } : null
-  };
-  state.chats.push(userMsg);
+  const now = new Date();
+  const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  chats.push({ id: String(Date.now()), sender: 'user', text, time: timeStr, quote: currentQuoting });
   input.value = '';
   currentQuoting = null;
   $('#quotingBanner').style.display = 'none';
-  renderChat();
-  addLog('USER_MSG', `用户发送: "${text.slice(0,24)}"`);
 
-  // 检查 API 配置
-  if (!apiConfig.endpoint || !apiConfig.apiKey) {
-    state.chats.push({
-      id: String(Date.now()+1),
-      sender: 'system',
-      type: 'system',
-      text: '提示：尚未设置 API 端点或密钥。请点击右上角菜单进入「API 设置」填入密钥后开启实时对话。'
-    });
-    renderChat();
-    openApiModal();
+  const aiId = String(Date.now()+1);
+  const aiMsg = { id: aiId, sender: 'ai', text: '', time: timeStr, streaming: true };
+  chats.push(aiMsg);
+  renderChats();
+
+  $('#sendBtn').style.display = 'none';
+  $('#stopBtn').style.display = 'flex';
+  activeAbortController = new AbortController();
+
+  const activeApi = apis.find(a => a.isActive);
+  addLog('CHAT_SEND', `发送: "${text.slice(0, 20)}"`);
+
+  // 本地 fallback
+  if(!activeApi || !activeApi.endpoint || !activeApi.fullKey){
+    const fallbacks = [
+      '我在听。不用急着把话说得那么完整，今晚把疲倦折叠起来就好。',
+      '风停在窗台上了。如果你愿意，随时可以把碎碎念写在这一页。',
+      '未配置自定义 API 时，我依然会守在这里。可以在右侧菜单里填入你的专属密钥。'
+    ];
+    const picked = fallbacks[Math.floor(Math.random()*fallbacks.length)];
+    let acc = '';
+    for(let ch of picked){
+      if(activeAbortController.signal.aborted) break;
+      await new Promise(r => setTimeout(r, 40));
+      acc += ch;
+      aiMsg.text = acc;
+      renderChats();
+    }
+    aiMsg.streaming = false;
+    finishChatStream();
     return;
   }
 
-  // 2. 准备实时流式 AI 占位消息
-  const aiMsgId = String(Date.now() + 2);
-  const aiMsg = {
-    id: aiMsgId,
-    sender: 'ai',
-    type: 'text',
-    text: '',
-    time: nowHM(),
-    streaming: true
-  };
-  state.chats.push(aiMsg);
-  renderChat();
-
-  // 切换按钮至停止状态
-  $('#sendBtn').style.display = 'none';
-  $('#stopBtn').style.display = 'flex';
-  $('#chatInput').disabled = true;
-
-  activeAbortController = new AbortController();
-  addLog('API_STREAM', `发起流式请求 -> ${apiConfig.endpoint}`);
-
+  // 真实连接用户 API
   try {
-    // 构造上下文
-    const history = state.chats
-      .filter(m => m.type === 'text' && m.id !== aiMsgId && m.text.trim())
-      .slice(-14)
-      .map(m => ({ role: m.sender === 'me' ? 'user' : 'assistant', content: m.text }));
+    const sysPrompt = `${persona.systemPrompt}\n【对方身份】：${userProfile.name}，特质与喜好：${userProfile.notes}。绝对禁止输出任何 emoji 表情符号。`;
+    const history = chats.slice(-12).filter(m => m.id !== aiId).map(m=>({
+      role: m.sender === 'user' ? 'user' : 'assistant',
+      content: m.text
+    }));
 
-    const messagesPayload = [
-      { role: 'system', content: (apiConfig.systemPrompt || '') + '\n【指令】：绝对禁止在输出中使用任何 emoji 表情符号。' },
-      ...history
-    ];
-
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiConfig.apiKey.trim()}`
-    };
-
-    const res = await fetch(apiConfig.endpoint.trim(), {
+    const res = await fetch(activeApi.endpoint.trim(), {
       method: 'POST',
-      headers,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${activeApi.fullKey.trim()}`
+      },
       body: JSON.stringify({
-        model: apiConfig.model.trim() || 'deepseek-chat',
-        messages: messagesPayload,
-        temperature: Number(apiConfig.temperature) || 0.7,
+        model: activeApi.model.trim() || 'default',
+        messages: [{ role: 'system', content: sysPrompt }, ...history],
+        temperature: Number(persona.temperature) || 0.7,
         stream: true
       }),
       signal: activeAbortController.signal
     });
 
-    if (!res.ok) {
-      const errDetail = await res.text();
-      throw new Error(`HTTP ${res.status}: ${errDetail.slice(0, 100)}`);
+    if(!res.ok){
+      const errTxt = await res.text();
+      throw new Error(`HTTP ${res.status}: ${errTxt.slice(0, 100)}`);
     }
-
-    if (!res.body) throw new Error('未接收到流式输出体');
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder('utf-8');
-    let accumulated = '';
     let buffer = '';
+    let acc = '';
 
-    while (true) {
+    while(true){
       const { done, value } = await reader.read();
-      if (done) break;
-
+      if(done) break;
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith(':')) continue;
-
-        if (trimmed.startsWith('data:')) {
-          const dataStr = trimmed.slice(5).trim();
-          if (dataStr === '[DONE]') continue;
-
+      for(let l of lines){
+        const tr = l.trim();
+        if(tr.startsWith('data:')){
+          const d = tr.slice(5).trim();
+          if(d === '[DONE]') continue;
           try {
-            const parsed = JSON.parse(dataStr);
-            const delta = parsed.choices?.[0]?.delta?.content || '';
-            if (delta) {
-              accumulated += delta;
-              aiMsg.text = accumulated;
-              updateAiBubble(aiMsgId, accumulated, true);
+            const parsed = JSON.parse(d);
+            const delta = parsed.choices?.[0]?.delta?.content || parsed.choices?.[0]?.text || '';
+            if(delta){
+              acc += delta;
+              aiMsg.text = acc;
+              renderChats();
             }
-          } catch {}
+          }catch{}
         }
       }
     }
-
-    // 完成
     aiMsg.streaming = false;
-    updateAiBubble(aiMsgId, accumulated, false);
-    saveState();
-    addLog('API_DONE', `完成流式接收 (${accumulated.length} 字)`);
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      aiMsg.streaming = false;
-      aiMsg.text = aiMsg.text || '已手动中止';
-      updateAiBubble(aiMsgId, aiMsg.text, false);
-      addLog('API_STOP', '用户手动中止流式输出');
-    } else {
-      aiMsg.streaming = false;
-      aiMsg.text = aiMsg.text ? (aiMsg.text + `\n[连接异常: ${err.message}]`) : `[连接失败: ${err.message}]`;
-      updateAiBubble(aiMsgId, aiMsg.text, false);
-      addLog('API_ERROR', err.message);
-      toast(`API 错误: ${err.message}`);
-    }
+    addLog('API_DONE', `完成回复 (${acc.length} 字)`);
+  } catch(err){
+    aiMsg.streaming = false;
+    aiMsg.text = aiMsg.text || `[生成中断或异常: ${err.message}]`;
+    addLog('API_ERR', err.message);
+    toast(`提示: ${err.message}`);
   } finally {
-    $('#sendBtn').style.display = 'grid';
-    $('#stopBtn').style.display = 'none';
-    $('#chatInput').disabled = false;
-    $('#chatInput').focus();
-    activeAbortController = null;
-    saveState();
+    finishChatStream();
+    save(K.CHATS, chats);
+    renderChats();
   }
 }
 
-function updateAiBubble(id, text, isStreaming) {
-  const el = document.querySelector(`.msg[data-id="${id}"] .bubble span`);
-  const cursor = document.querySelector(`.msg[data-id="${id}"] .bubble .typingCursor`);
-  if (el) el.textContent = text;
-  if (!isStreaming && cursor) cursor.remove();
-  const box = $('#messages');
-  if (box) box.scrollTop = box.scrollHeight;
+function finishChatStream(){
+  $('#sendBtn').style.display = 'grid';
+  $('#stopBtn').style.display = 'none';
+  activeAbortController = null;
 }
+$('#stopBtn').onclick = () => { if(activeAbortController) activeAbortController.abort(); };
+$('#sendBtn').onclick = sendChatMessage;
+$('#chatInput').onkeydown = e => { if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendChatMessage(); } };
 
-$('#stopBtn').onclick = () => {
-  if (activeAbortController) activeAbortController.abort();
+// 导航切换
+function switchTab(name){
+  $$('.tabBtn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  $$('.view').forEach(v => v.classList.remove('active'));
+  $(`#view${name}`).classList.add('active');
+  if(name === 'Chat') renderChats();
+}
+$$('.tabBtn').forEach(btn => btn.onclick = () => switchTab(btn.dataset.tab));
+$('#goChatCard').onclick = () => switchTab('Chat');
+
+// 留声机曲库与播放
+function renderPlaylist(){
+  const box = $('#playlistBox');
+  box.innerHTML = musicList.map((m, idx)=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-size:10px;background:${idx === currentTrackIdx ? 'var(--primary)' : 'var(--card)'};color:${idx === currentTrackIdx ? 'var(--bg)' : 'var(--ink)'}">
+      <span onclick="playTrack(${idx})" style="cursor:pointer;flex:1">${m.title} - <small style="opacity:.7">${m.artist}</small></span>
+      <button onclick="delMusic(${idx})">✕</button>
+    </div>
+  `).join('');
+}
+window.playTrack = idx => {
+  currentTrackIdx = idx;
+  const t = musicList[idx];
+  audio.src = t.url;
+  audio.play().then(()=>{
+    $('#homeDisc').classList.add('spin');
+    $('#togglePlayBtn').textContent = '⏸';
+    renderApp();
+    toast(`正在播放: ${t.title}`);
+  }).catch(()=> toast('播放失败，请确认直链支持跨域'));
+};
+window.delMusic = idx => {
+  if(musicList.length <= 1){ toast('至少保留一首歌曲'); return; }
+  musicList.splice(idx, 1);
+  save(K.MUSIC, musicList);
+  renderPlaylist();
+};
+$('#togglePlayBtn').onclick = () => {
+  if(audio.paused){
+    playTrack(currentTrackIdx);
+  } else {
+    audio.pause();
+    $('#homeDisc').classList.remove('spin');
+    $('#togglePlayBtn').textContent = '▶';
+    toast('已暂停');
+  }
+};
+$('#mPlayBtn').onclick = () => $('#togglePlayBtn').click();
+$('#mPrevBtn').onclick = () => {
+  currentTrackIdx = (currentTrackIdx - 1 + musicList.length) % musicList.length;
+  playTrack(currentTrackIdx);
+};
+$('#mNextBtn').onclick = () => {
+  currentTrackIdx = (currentTrackIdx + 1) % musicList.length;
+  playTrack(currentTrackIdx);
+};
+$('#addMusicBtn').onclick = () => {
+  const u = $('#newMusicUrl').value.trim();
+  const title = $('#newMusicTitle').value.trim() || '未命名曲目';
+  if(!u){ toast('请填入音频直链'); return; }
+  musicList.push({ id: String(Date.now()), title, artist: '网络音乐', url: u });
+  save(K.MUSIC, musicList);
+  renderPlaylist();
+  $('#newMusicUrl').value = '';
+  $('#newMusicTitle').value = '';
+  toast('已加入曲库');
 };
 
-$('#sendBtn').onclick = sendMessage;
-$('#chatInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+// 侧边栏 & 弹窗绑定
+$('#openDrawerBtn').onclick = () => $('#drawerOverlay').classList.add('show');
+$('#closeDrawerBtn').onclick = () => $('#drawerOverlay').classList.remove('show');
+$('#chatMenuBtn').onclick = () => $('#drawerOverlay').classList.add('show');
+
+$$('[data-close-modal]').forEach(b => b.onclick = () => $$('.modalOverlay').forEach(m => m.classList.remove('show')));
+
+$$('[data-act]').forEach(b => {
+  b.onclick = () => {
+    $('#drawerOverlay').classList.remove('show');
+    const act = b.dataset.act;
+    if(act === 'api') $('#apiModal').classList.add('show');
+    else if(act === 'persona') $('#personaModal').classList.add('show');
+    else if(act === 'user') $('#userModal').classList.add('show');
+    else if(act === 'space') $('#spaceModal').classList.add('show');
+    else if(act === 'music') $('#musicModal').classList.add('show');
+    else if(act === 'friends') switchTab('Friends');
+    else if(act === 'logs') switchTab('Logs');
+    else if(act === 'avatar') $('#avatarModal').classList.add('show');
+    else if(act === 'wallpaper') $('#wallModal').classList.add('show');
+    else if(act === 'theme'){
+      isNight = !isNight;
+      save(K.THEME, isNight);
+      renderApp();
+      toast(isNight ? '已切换至夜间模式' : '已切换至白间模式');
+    } else if(act === 'block'){
+      isBlocked = !isBlocked;
+      save(K.BLOCKED, isBlocked);
+      renderApp();
+      toast(isBlocked ? '已拉黑该联系人' : '已解除拉黑');
+    }
+  };
 });
 
-/* 时钟与电量 */
-function clock() {
-  const d = new Date();
-  const time = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-  $('#statusClock').textContent = time;
-  $('#homeDay').textContent = String(d.getDate()).padStart(2,'0');
-  $('#homeMonth').textContent = d.toLocaleDateString('en-US', { month: 'short', weekday: 'long' }).toUpperCase();
-}
-setInterval(clock, 1000);
-clock();
+// 保存 API (不推荐，自由自填)
+$('#saveApiBtn').onclick = () => {
+  const ep = $('#newApiEndpoint').value.trim();
+  const key = $('#newApiKey').value.trim();
+  const model = $('#newApiModel').value.trim() || 'default-model';
+  const label = $('#newApiLabel').value.trim() || '自定义接口';
+  if(!ep){ toast('请填入 API 端点'); return; }
 
-if (navigator.getBattery) {
-  navigator.getBattery().then(b => {
-    const upd = () => {
-      const p = Math.round(b.level * 100) + '%';
-      $('#batteryText').textContent = p;
-      $('#batteryBar').style.width = p;
-    };
+  const d = new Date();
+  const timeStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+  apis.forEach(a => a.isActive = false);
+  apis.unshift({ id: String(Date.now()), label, endpoint: ep, fullKey: key, model, createdAt: timeStr, isActive: true });
+  save(K.APIS, apis);
+  $('#apiModal').classList.remove('show');
+  renderApp();
+  addLog('API_ADD', `新增端点: ${ep}`);
+  toast('已保存并激活端点');
+};
+
+// Ping 测试
+$('#pingTestBtn').onclick = async () => {
+  const ep = $('#newApiEndpoint').value.trim();
+  const key = $('#newApiKey').value.trim();
+  const resBox = $('#pingRes');
+  if(!ep){ toast('请填入端点'); return; }
+  resBox.style.display = 'block';
+  resBox.style.background = 'rgba(0,0,0,.05)';
+  resBox.textContent = '测试中...';
+
+  const t0 = Date.now();
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    if(key) headers['Authorization'] = `Bearer ${key}`;
+    const r = await fetch(ep, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ model: $('#newApiModel').value.trim() || 'test', messages: [{ role: 'user', content: 'Ping' }], max_tokens: 2 })
+    });
+    const lat = Date.now() - t0;
+    if(r.ok){
+      resBox.style.color = '#047857';
+      resBox.textContent = `连通成功 (${lat}ms) · 状态 HTTP ${r.status}`;
+    } else {
+      resBox.style.color = '#b91c1c';
+      resBox.textContent = `HTTP ${r.status} 响应异常`;
+    }
+  } catch(e){
+    resBox.style.color = '#b91c1c';
+    resBox.textContent = `失败: ${e.message} (跨域受限需服务端 CORS 支持)`;
+  }
+};
+
+// 人设预设
+$('#preset1Btn').onclick = () => {
+  $('#editPersonaSys').value = '你是 airp，一个拥有韩系ins极简甜酷气质的伴侣。语言克制温凉、句式偏短，绝对不要使用任何 emoji 表情符号。';
+  $('#editPersonaRel').value = '恋人';
+  $('#editPersonaQuote').value = '凌晨的风很凉，随时可以把碎碎念放在这里。';
+};
+$('#preset2Btn').onclick = () => {
+  $('#editPersonaSys').value = '你是 airp，清冷矜持、略带傲娇的猫系伴侣。语气慵懒但内心重视对方，绝对不使用任何 emoji 表情符号。';
+  $('#editPersonaRel').value = '恋人';
+  $('#editPersonaQuote').value = '……别误会，我只是刚好在整理桌面而已。';
+};
+$('#preset3Btn').onclick = () => {
+  $('#editPersonaSys').value = '你是 airp，温厚深邃的深海知己。理智包容，提供无压力的陪伴，绝对不使用任何 emoji 表情符号。';
+  $('#editPersonaRel').value = '知己';
+  $('#editPersonaQuote').value = '慢下来也没关系，在缝隙里留一点空间给真实。';
+};
+$('#preset4Btn').onclick = () => {
+  $('#editPersonaSys').value = '你是 airp，极简现代诗写作者。句子留白有诗意，段落呼吸感充足，绝对不使用任何 emoji 表情符号。';
+  $('#editPersonaRel').value = '知己';
+  $('#editPersonaQuote').value = '在黑夜与白日的接缝处，拥有相同的安静。';
+};
+$('#savePersonaBtn').onclick = () => {
+  persona.name = $('#editPersonaName').value.trim() || '小熊';
+  persona.avatar = $('#editPersonaAvatar').value.trim() || persona.avatar;
+  persona.relationship = $('#editPersonaRel').value.trim() || '恋人';
+  persona.statusQuote = $('#editPersonaQuote').value.trim() || persona.statusQuote;
+  persona.temperature = parseFloat($('#editPersonaTemp').value) || 0.7;
+  persona.systemPrompt = $('#editPersonaSys').value;
+  save(K.PERSONA, persona);
+  $('#personaModal').classList.remove('show');
+  renderApp();
+  toast('人设已保存');
+};
+
+// 用户设定保存
+$('#saveUserBtn').onclick = () => {
+  userProfile.name = $('#editUserName').value.trim() || '我';
+  userProfile.notes = $('#editUserNotes').value.trim();
+  userProfile.days = Number($('#editUserDays').value) || 1;
+  save(K.USER, userProfile);
+  $('#userModal').classList.remove('show');
+  renderApp();
+  toast('用户设定已保存');
+};
+
+// 头像更换 (支持相册 Base64 或 URL)
+$('#saveAvatarBtn').onclick = () => {
+  const target = $('#avatarTarget').value;
+  const url = $('#avatarUrlInput').value.trim();
+  const file = $('#avatarFileInput').files[0];
+  const apply = src => {
+    if(target === 'ai') persona.avatar = src;
+    else userProfile.avatar = src;
+    save(K.PERSONA, persona);
+    save(K.USER, userProfile);
+    $('#avatarModal').classList.remove('show');
+    renderApp();
+    toast('头像已更新');
+  };
+  if(file){
+    const reader = new FileReader();
+    reader.onload = () => apply(reader.result);
+    reader.readAsDataURL(file);
+  } else if(url){
+    apply(url);
+  }
+};
+
+// 壁纸设置
+$('#saveWallBtn').onclick = () => {
+  const url = $('#wallUrlInput').value.trim();
+  const file = $('#wallFileInput').files[0];
+  const apply = src => {
+    wallpaper = src;
+    save(K.WALL, wallpaper);
+    $('#wallModal').classList.remove('show');
+    renderApp();
+    toast('壁纸已应用');
+  };
+  if(file){
+    const reader = new FileReader();
+    reader.onload = () => apply(reader.result);
+    reader.readAsDataURL(file);
+  } else if(url){
+    apply(url);
+  }
+};
+$('#clearWallBtn').onclick = () => {
+  wallpaper = '';
+  save(K.WALL, '');
+  $('#wallModal').classList.remove('show');
+  renderApp();
+  toast('已清除壁纸');
+};
+
+// 时间书
+$('#newBookPageBtn').onclick = () => $('#bookModal').classList.add('show');
+$('#saveBookBtn').onclick = () => {
+  const title = $('#bookTitle').value.trim();
+  const content = $('#bookContent').value.trim();
+  const mood = $('#bookMood').value.trim() || '静谧';
+  const img = $('#bookImage').value.trim();
+  if(!title || !content) return;
+  const d = new Date();
+  timeBook.unshift({ id: String(Date.now()), date: `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`, title, mood, content, img, isFav: false });
+  save(K.BOOK, timeBook);
+  $('#bookModal').classList.remove('show');
+  renderTimeBook();
+  toast('已装订入书');
+};
+
+// 动态发布
+$('#newMomentBtn').onclick = () => $('#momentModal').classList.add('show');
+$('#saveMomentBtn').onclick = () => {
+  const text = $('#momentTextInput').value.trim();
+  const img = $('#momentImgInput').value.trim();
+  if(!text) return;
+  moments.unshift({ id: String(Date.now()), author: userProfile.name, text, img, likes: 0, comments: [] });
+  save(K.MOMENTS, moments);
+  $('#momentModal').classList.remove('show');
+  renderMoments();
+  toast('动态已发布');
+};
+
+// 加好友
+$('#newFriendBtn').onclick = () => $('#friendModal').classList.add('show');
+$('#saveFriendBtn').onclick = () => {
+  const name = $('#friendNameInput').value.trim();
+  const note = $('#friendNoteInput').value.trim() || '新朋友';
+  if(!name) return;
+  friends.push({ id: String(Date.now()), name, note });
+  save(K.FRIENDS, friends);
+  $('#friendModal').classList.remove('show');
+  renderFriends();
+  toast(`已添加好友 ${name}`);
+};
+
+// 打卡
+$('#checkinBtn').onclick = () => {
+  userProfile.days++;
+  userProfile.lastCheckin = new Date().toISOString().slice(0,10);
+  save(K.USER, userProfile);
+  renderApp();
+  toast('今日打卡成功 ♡');
+};
+
+// 标点
+$$('.quickBar button').forEach(b => {
+  b.onclick = () => {
+    $('#chatInput').value += b.dataset.ins;
+    $('#chatInput').focus();
+  };
+});
+
+$('#clearChatBtn').onclick = () => {
+  chats = [];
+  save(K.CHATS, chats);
+  renderChats();
+  toast('聊天记录已清空');
+};
+
+// 灯箱
+window.openLightbox = (url, title) => {
+  $('#lightboxImg').src = url;
+  $('#lightboxTitle').textContent = title;
+  $('#lightboxModal').classList.add('show');
+};
+
+// 时钟与电量
+setInterval(()=>{
+  const d = new Date();
+  $('#sysClock').textContent = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}, 1000);
+
+if(navigator.getBattery){
+  navigator.getBattery().then(b=>{
+    const upd = () => $('#batteryPct').textContent = `${Math.round(b.level*100)}%`;
     upd();
     b.addEventListener('levelchange', upd);
   }).catch(()=>{});
 }
 
 // 初始化
-applyTheme();
-renderChat();
-renderMoments();
-renderFriends();
-renderLogs();
+setupWeekStrip();
+renderApp();
+renderChats();
 })();
 </script>
 </body>
